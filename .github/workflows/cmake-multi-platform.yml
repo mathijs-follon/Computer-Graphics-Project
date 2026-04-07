@@ -54,13 +54,13 @@ jobs:
     steps:
     - uses: actions/checkout@v4
 
-    - name: Install GLFW on Linux
+    - name: Install dependencies on Linux
       if: runner.os == 'Linux'
-      run: sudo apt-get update && sudo apt-get install -y libglfw3-dev
+      run: sudo apt-get update && sudo apt-get install -y libglfw3-dev libspdlog-dev
 
-    - name: Install GLFW on macOS
+    - name: Install dependencies on macOS
       if: runner.os == 'macOS'
-      run: brew install glfw
+      run: brew install glfw spdlog
 
     - name: Bootstrap vcpkg (Windows)
       if: runner.os == 'Windows'
@@ -68,7 +68,7 @@ jobs:
       run: |
         git clone https://github.com/microsoft/vcpkg.git "${{ github.workspace }}/vcpkg"
         "${{ github.workspace }}/vcpkg/bootstrap-vcpkg.sh"
-        "${{ github.workspace }}/vcpkg/vcpkg" install glfw3:x64-windows
+        "${{ github.workspace }}/vcpkg/vcpkg" install glfw3:x64-windows spdlog:x64-windows
 
     - name: Set reusable strings
       # Turn repeated input strings (such as the build output directory) into step outputs. These step outputs can be used throughout the workflow file.
