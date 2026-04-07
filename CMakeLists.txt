@@ -5,6 +5,18 @@ set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 enable_testing()
 
+find_package(Python 3 COMPONENTS Interpreter REQUIRED)
+
+include(FetchContent)
+FetchContent_Declare(
+    glad
+    GIT_REPOSITORY https://github.com/Dav1dde/glad.git
+    GIT_TAG v2.0.8
+    SOURCE_SUBDIR cmake
+)
+FetchContent_MakeAvailable(glad)
+glad_add_library(glad_gl STATIC REPRODUCIBLE API gl:core=3.3)
+
 find_package(glfw3 CONFIG REQUIRED)
 if(TARGET glfw)
     set(GLFW_TARGET glfw)
@@ -12,15 +24,6 @@ elseif(TARGET glfw::glfw)
     set(GLFW_TARGET glfw::glfw)
 else()
     message(FATAL_ERROR "glfw3 package found, but no known GLFW target is exported.")
-endif()
-
-find_package(glad CONFIG QUIET)
-if(TARGET glad::glad)
-    set(GLAD_TARGET glad::glad)
-elseif(TARGET glad)
-    set(GLAD_TARGET glad)
-else()
-    message(WARNING "Missing glad package. Install a package exporting glad::glad or glad.")
 endif()
 
 find_package(glm CONFIG QUIET)
@@ -106,8 +109,8 @@ target_include_directories(CG_OpenGL_Project PRIVATE
 target_compile_options(CG_OpenGL_Project PRIVATE ${PROJECT_WARNING_FLAGS})
 
 target_link_libraries(CG_OpenGL_Project PRIVATE
+    glad_gl
     ${GLFW_TARGET}
-    ${GLAD_TARGET}
     ${GLM_TARGET}
     ${IMGUI_TARGET}
     ${JSON_TARGET}
