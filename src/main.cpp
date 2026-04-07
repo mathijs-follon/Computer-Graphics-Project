@@ -1,5 +1,6 @@
-#include <print>
+#include <iostream>
 
 int main() {
-    std::println("Hello Computer Graphics!");
+    std::cout << "Hello Computer Graphics!" << '\n';
+    return 0;
 }

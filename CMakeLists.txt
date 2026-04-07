@@ -107,12 +107,14 @@ target_link_libraries(CG_Project PRIVATE
     ${TINYGLTF_TARGET}
 )
 
-add_custom_command(
-        TARGET CG_Project
-        POST_BUILD
-        COMMAND ${CMAKE_COMMAND} -E copy_directory
-        "${CMAKE_CURRENT_SOURCE_DIR}/assets"
-        "$<TARGET_FILE_DIR:CG_Project>/assets"
-        COMMENT "Copying assets to $<TARGET_FILE_DIR:CG_Project>"
-        VERBATIM)
+if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/assets")
+    add_custom_command(
+            TARGET CG_Project
+            POST_BUILD
+            COMMAND ${CMAKE_COMMAND} -E copy_directory
+            "${CMAKE_CURRENT_SOURCE_DIR}/assets"
+            "$<TARGET_FILE_DIR:CG_Project>/assets"
+            COMMENT "Copying assets to $<TARGET_FILE_DIR:CG_Project>"
+            VERBATIM)
+endif()
 

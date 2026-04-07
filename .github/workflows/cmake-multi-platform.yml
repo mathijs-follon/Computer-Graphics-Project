@@ -62,13 +62,13 @@ jobs:
       if: runner.os == 'macOS'
       run: brew install glfw
 
-    - name: Setup vcpkg (Windows)
+    - name: Bootstrap vcpkg (Windows)
       if: runner.os == 'Windows'
-      uses: lukka/run-vcpkg@v11
-
-    - name: Install GLFW with vcpkg (Windows)
-      if: runner.os == 'Windows'
-      run: vcpkg install glfw3:x64-windows
+      shell: bash
+      run: |
+        git clone https://github.com/microsoft/vcpkg.git "${{ github.workspace }}/vcpkg"
+        "${{ github.workspace }}/vcpkg/bootstrap-vcpkg.sh"
+        "${{ github.workspace }}/vcpkg/vcpkg" install glfw3:x64-windows
 
     - name: Set reusable strings
       # Turn repeated input strings (such as the build output directory) into step outputs. These step outputs can be used throughout the workflow file.
@@ -82,7 +82,7 @@ jobs:
       shell: bash
       run: |
         if [ "${{ runner.os }}" = "Windows" ]; then
-          echo "args=-DCMAKE_TOOLCHAIN_FILE=$VCPKG_INSTALLATION_ROOT/scripts/buildsystems/vcpkg.cmake -DVCPKG_TARGET_TRIPLET=x64-windows" >> "$GITHUB_OUTPUT"
+          echo "args=-DCMAKE_TOOLCHAIN_FILE=${{ github.workspace }}/vcpkg/scripts/buildsystems/vcpkg.cmake -DVCPKG_TARGET_TRIPLET=x64-windows" >> "$GITHUB_OUTPUT"
         else
           echo "args=" >> "$GITHUB_OUTPUT"
         fi
