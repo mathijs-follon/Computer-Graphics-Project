@@ -80,6 +80,17 @@ void critical(const char* file, int line, const std::string_view fmt, Args&&... 
     flush_if_needed(false);
 }
 
+inline void default_setup() {
+    if (const auto default_logger = logger::default_logger();
+        default_logger && default_logger->name().empty()) {
+        auto logger =
+            logger::create_rotating_logger("cg", "cg_openGL_project.log", 5 * 1024 * 1024, 3);
+        logger->set_level(spdlog::level::trace);
+        logger->flush_on(spdlog::level::warn);
+        logger::set_default_logger(std::move(logger));
+    }
+}
+
 }  // namespace logger
 
 #define LOG_INFO(...) ::logger::info(__VA_ARGS__)
