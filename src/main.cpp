@@ -1,6 +1,8 @@
+#include "log/log.hpp"
+
 #include <iostream>
 
 int main() {
-    std::cout << "Hello Computer Graphics!" << '\n';
+    LOG_INFO("Hello Computer Graphics!");
     return 0;
 }
