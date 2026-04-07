@@ -3,6 +3,7 @@ project(CG_Project)
 
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
+enable_testing()
 
 find_package(glfw3 CONFIG REQUIRED)
 if(TARGET glfw)
@@ -117,4 +118,13 @@ if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/assets")
             COMMENT "Copying assets to $<TARGET_FILE_DIR:CG_Project>"
             VERBATIM)
 endif()
+
+add_executable(template_test
+    tests/template_test.cpp
+)
+
+add_test(
+    NAME template_test
+    COMMAND template_test
+)
 
