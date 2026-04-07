@@ -1,0 +1,3 @@
+/home/huplo/Projects/School/Computer-Graphics-Project/build/CMakeFiles/CG_Project.dir
+/home/huplo/Projects/School/Computer-Graphics-Project/build/CMakeFiles/edit_cache.dir
+/home/huplo/Projects/School/Computer-Graphics-Project/build/CMakeFiles/rebuild_cache.dir

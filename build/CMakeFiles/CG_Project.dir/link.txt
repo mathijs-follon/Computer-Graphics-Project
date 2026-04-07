@@ -1,0 +1,1 @@
+/usr/bin/c++ -Wl,--dependency-file=CMakeFiles/CG_Project.dir/link.d CMakeFiles/CG_Project.dir/src/main.cpp.o -o CG_Project  /usr/local/lib/libglfw3.a /usr/lib/libglm.a /usr/lib/librt.a -lm -ldl /usr/lib/libX11.so /usr/lib/libfmt.so.12.1.0
