@@ -5,17 +5,12 @@ set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 enable_testing()
 
-find_package(Python 3 COMPONENTS Interpreter REQUIRED)
-
-include(FetchContent)
-FetchContent_Declare(
-    glad
-    GIT_REPOSITORY https://github.com/Dav1dde/glad.git
-    GIT_TAG v2.0.8
-    SOURCE_SUBDIR cmake
+add_library(glad_gl STATIC
+    third_party/glad/src/gl.c
 )
-FetchContent_MakeAvailable(glad)
-glad_add_library(glad_gl STATIC REPRODUCIBLE API gl:core=3.3)
+target_include_directories(glad_gl PUBLIC
+    third_party/glad/include
+)
 
 find_package(glfw3 CONFIG REQUIRED)
 if(TARGET glfw)
