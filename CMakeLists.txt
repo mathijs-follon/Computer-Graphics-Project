@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.30)
-project(CG_Project)
+project(CG_OpenGL_Project)
 
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -87,15 +87,25 @@ else()
     message(WARNING "Missing tinygltf package. Install a package exporting tinygltf::tinygltf or tinygltf.")
 endif()
 
-add_executable(CG_Project
+if(MSVC)
+    set(PROJECT_WARNING_FLAGS /W4)
+else()
+    set(PROJECT_WARNING_FLAGS -Wall -Wextra)
+endif()
+
+add_executable(CG_OpenGL_Project
     src/main.cpp
+        src/log/log.hpp
+        src/log/log.cpp
 )
 
-target_include_directories(CG_Project PRIVATE
+target_include_directories(CG_OpenGL_Project PRIVATE
     src/
 )
 
-target_link_libraries(CG_Project PRIVATE
+target_compile_options(CG_OpenGL_Project PRIVATE ${PROJECT_WARNING_FLAGS})
+
+target_link_libraries(CG_OpenGL_Project PRIVATE
     ${GLFW_TARGET}
     ${GLAD_TARGET}
     ${GLM_TARGET}
@@ -110,18 +120,20 @@ target_link_libraries(CG_Project PRIVATE
 
 if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/assets")
     add_custom_command(
-            TARGET CG_Project
+            TARGET CG_OpenGL_Project
             POST_BUILD
             COMMAND ${CMAKE_COMMAND} -E copy_directory
             "${CMAKE_CURRENT_SOURCE_DIR}/assets"
-            "$<TARGET_FILE_DIR:CG_Project>/assets"
-            COMMENT "Copying assets to $<TARGET_FILE_DIR:CG_Project>"
+            "$<TARGET_FILE_DIR:CG_OpenGL_Project>/assets"
+            COMMENT "Copying assets to $<TARGET_FILE_DIR:CG_OpenGL_Project>"
             VERBATIM)
 endif()
 
 add_executable(template_test
     tests/template_test.cpp
 )
+
+target_compile_options(template_test PRIVATE ${PROJECT_WARNING_FLAGS})
 
 add_test(
     NAME template_test
