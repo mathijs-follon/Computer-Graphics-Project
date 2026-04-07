@@ -46,8 +46,7 @@ int main() {
         return EXIT_FAILURE;
     }
 
-    LOG_INFO("Hello GLFW — window open (OpenGL {}.{})",
-             GLAD_VERSION_MAJOR(gl_version),
+    LOG_INFO("Hello GLFW — window open (OpenGL {}.{})", GLAD_VERSION_MAJOR(gl_version),
              GLAD_VERSION_MINOR(gl_version));
 
     glClearColor(0.15f, 0.18f, 0.22f, 1.0f);
