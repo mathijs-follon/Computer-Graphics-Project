@@ -1,0 +1,36 @@
+name: Clang Format Check
+
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+    branches: ["main"]
+
+jobs:
+  format:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install clang-format
+        run: sudo apt-get update && sudo apt-get install -y clang-format
+
+      - name: Apply .clang-format and verify no diffs
+        shell: bash
+        run: |
+          files=$(git ls-files '*.c' '*.cc' '*.cpp' '*.h' '*.hh' '*.hpp')
+          if [ -z "$files" ]; then
+            echo "No C/C++ source files found."
+            exit 0
+          fi
+
+          echo "$files" | xargs clang-format -i
+
+          if ! git diff --quiet; then
+            echo "Formatting changes are required. Please run clang-format locally."
+            git --no-pager diff
+            exit 1
+          fi
+
+          echo "Formatting is already compliant."
