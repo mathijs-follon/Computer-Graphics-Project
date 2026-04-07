@@ -19,7 +19,13 @@ jobs:
       - name: Apply .clang-format and verify no diffs
         shell: bash
         run: |
-          files=$(git ls-files src | rg '\.(c|cc|cpp|h|hh|hpp)$')
+          files=$(
+            git ls-files src | while IFS= read -r f; do
+              case "$f" in
+                *.c|*.cc|*.cpp|*.h|*.hh|*.hpp) printf '%s\n' "$f" ;;
+              esac
+            done
+          )
           if [ -z "$files" ]; then
             echo "No C/C++ source files found."
             exit 0
