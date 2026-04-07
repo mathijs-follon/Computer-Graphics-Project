@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.30)
+cmake_minimum_required(VERSION 4.2)
 project(CG_OpenGL_Project)
 
 set(CMAKE_CXX_STANDARD 23)
@@ -94,7 +94,7 @@ else()
 endif()
 
 add_executable(CG_OpenGL_Project
-    src/main.cpp
+        src/main.cpp
         src/log/log.hpp
         src/log/log.cpp
 )

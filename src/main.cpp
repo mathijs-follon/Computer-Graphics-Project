@@ -1,7 +1,5 @@
 #include "log/log.hpp"
 
-#include <iostream>
-
 int main() {
     logger::default_setup();
 
