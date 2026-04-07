@@ -4,6 +4,7 @@ project(CG_OpenGL_Project)
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 enable_testing()
+include(FetchContent)
 
 add_library(glad_gl STATIC
     third_party/glad/src/gl.c
@@ -72,8 +73,38 @@ endif()
 find_package(stb CONFIG QUIET)
 if(TARGET stb::stb)
     set(STB_TARGET stb::stb)
+elseif(TARGET stb)
+    set(STB_TARGET stb)
 else()
-    message(WARNING "Missing stb package. Install a package exporting stb::stb.")
+    find_path(STB_INCLUDE_DIR
+        NAMES stb_image.h
+        PATH_SUFFIXES stb
+    )
+    if(STB_INCLUDE_DIR)
+        add_library(stb_headers INTERFACE)
+        target_include_directories(stb_headers INTERFACE ${STB_INCLUDE_DIR})
+        set(STB_TARGET stb_headers)
+    else()
+        FetchContent_Declare(
+            stb_source
+            GIT_REPOSITORY https://github.com/nothings/stb.git
+            GIT_TAG master
+        )
+        FetchContent_GetProperties(stb_source)
+        if(NOT stb_source_POPULATED)
+            if(POLICY CMP0169)
+                cmake_policy(SET CMP0169 OLD)
+            endif()
+            FetchContent_Populate(stb_source)
+        endif()
+        if(EXISTS "${stb_source_SOURCE_DIR}/stb_image.h")
+            add_library(stb_headers INTERFACE)
+            target_include_directories(stb_headers INTERFACE ${stb_source_SOURCE_DIR})
+            set(STB_TARGET stb_headers)
+        else()
+            message(WARNING "Missing stb package/headers and failed to fetch stb.")
+        endif()
+    endif()
 endif()
 
 find_package(tinygltf CONFIG QUIET)
@@ -82,7 +113,34 @@ if(TARGET tinygltf::tinygltf)
 elseif(TARGET tinygltf)
     set(TINYGLTF_TARGET tinygltf)
 else()
-    message(WARNING "Missing tinygltf package. Install a package exporting tinygltf::tinygltf or tinygltf.")
+    find_path(TINYGLTF_INCLUDE_DIR
+        NAMES tiny_gltf.h
+    )
+    if(TINYGLTF_INCLUDE_DIR)
+        add_library(tinygltf_headers INTERFACE)
+        target_include_directories(tinygltf_headers INTERFACE ${TINYGLTF_INCLUDE_DIR})
+        set(TINYGLTF_TARGET tinygltf_headers)
+    else()
+        FetchContent_Declare(
+            tinygltf_source
+            GIT_REPOSITORY https://github.com/syoyo/tinygltf.git
+            GIT_TAG release
+        )
+        FetchContent_GetProperties(tinygltf_source)
+        if(NOT tinygltf_source_POPULATED)
+            if(POLICY CMP0169)
+                cmake_policy(SET CMP0169 OLD)
+            endif()
+            FetchContent_Populate(tinygltf_source)
+        endif()
+        if(EXISTS "${tinygltf_source_SOURCE_DIR}/tiny_gltf.h")
+            add_library(tinygltf_headers INTERFACE)
+            target_include_directories(tinygltf_headers INTERFACE ${tinygltf_source_SOURCE_DIR})
+            set(TINYGLTF_TARGET tinygltf_headers)
+        else()
+            message(WARNING "Missing tinygltf package/headers and failed to fetch tinygltf.")
+        endif()
+    endif()
 endif()
 
 if(MSVC)
