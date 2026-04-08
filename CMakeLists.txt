@@ -53,7 +53,7 @@ elseif(NOT EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/third_party/tinygltf/tiny_gltf.h"
     FetchContent_MakeAvailable(tinygltf)
 endif()
 
-if(NOT EXISTS "third_party/glad/src/gl.c")
+if(NOT EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/third_party/glad/src/gl.c")
     message(FATAL_ERROR "GLAD source not found at third_party/glad/src/gl.c")
 endif()
 add_library(glad_gl STATIC third_party/glad/src/gl.c)
