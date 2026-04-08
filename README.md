@@ -2,3 +2,8 @@
 
 
 # Computer-Graphics-Project
+
+
+# Session Logging
+
+Our session logs can be found here [@Tarudahat logs](/logging/taru.md), [@mathijs-follon logs](/logging/mathijs.md)
