@@ -86,6 +86,16 @@ add_executable(CG_OpenGL_Project
         src/main.cpp
         src/log/log.hpp
         src/log/log.cpp
+        src/world/registry.hpp
+        src/app/pipeline.hpp
+        src/app/app.hpp
+        src/app/app.hpp
+        src/app/app.hpp
+        src/app/pipeline.hpp
+        src/app/system.hpp
+        src/world/events.hpp
+        src/graphics/window.hpp
+        src/graphics/camera.hpp
 )
 
 target_include_directories(CG_OpenGL_Project PRIVATE

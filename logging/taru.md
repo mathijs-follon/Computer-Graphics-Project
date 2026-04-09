@@ -13,8 +13,7 @@
 
 | Date       | Start | End   | Total Time (h) | Focus / Description |
 |------------|-------|-------|----------------|---------------------|
-| YYYY-MM-DD |       |       |                |                     |
-| YYYY-MM-DD |       |       |                |                     |
+| DD-MM-YYYY |       |       |                |                     |
 
 ---
 
@@ -28,5 +27,4 @@
 
 - Total Hours Spent:
 - Most Time-Consuming Part:
-- Key Achievements:
 - What Could Be Improved:

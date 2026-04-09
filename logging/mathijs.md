@@ -11,10 +11,10 @@
 
 ## Sessions Log
 
-| Date       | Start | End   | Total Time (h) | Focus / Description |
-|------------|-------|-------|----------------|---------------------|
-| YYYY-MM-DD |       |       |                |                     |
-| YYYY-MM-DD |       |       |                |                     |
+| Date       | Start | End   | Total Time | Focus / Description                                                             |
+|------------|-------|-------|------------|---------------------------------------------------------------------------------|
+| 09-04-2026 | 10:00 | 11:49 |            | Planning en issues / milestones bespreken + architectuur maken (samen met Taru) |
+| 09-04-2026 | 12:19 | 13:23 |            | window (from example) setup en logger                                           |
 
 ---
 
@@ -28,5 +28,4 @@
 
 - Total Hours Spent:
 - Most Time-Consuming Part:
-- Key Achievements:
 - What Could Be Improved:
