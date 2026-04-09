@@ -14,7 +14,7 @@
 | Date       | Start | End   | Total Time | Focus / Description                                                             |
 |------------|-------|-------|------------|---------------------------------------------------------------------------------|
 | 09-04-2026 | 10:00 | 11:49 |            | Planning en issues / milestones bespreken + architectuur maken (samen met Taru) |
-| 09-04-2026 | 12:19 | 13:23 |            | window (from example) setup en logger                                           |
+| 09-04-2026 | 12:19 | 13:15 |            | window (from example) setup en logger                                           |
 
 ---
 
