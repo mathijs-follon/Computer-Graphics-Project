@@ -22,7 +22,8 @@ public:
     template <typename T>
     [[nodiscard]] bool hasObject(const std::string& name) const {
         if (const auto it = m_objects.find(name); it != m_objects.end()) {
-            // If found an object with name, return true if the found type matches the requested type
+            // If found an object with name, return true if the found type matches the requested
+            // type
             return it->second.type() == typeid(T);
         }
         return false;
@@ -48,18 +49,18 @@ public:
     template <typename T>
     auto getObjects() {
         return m_objects | std::views::values |
-                // Cast all to the requested T type
+               // Cast all to the requested T type
                std::views::transform([](std::any& value) { return std::any_cast<T>(&value); }) |
-                // Filter out failed casts (nullptr's)
+               // Filter out failed casts (nullptr's)
                std::views::filter([](const T* value) { return value != nullptr; });
     }
 
-
     template <typename T>
     auto getObjects() const {
-        return m_objects | std::views::values |
-            std::views::transform([](const std::any& value) { return std::any_cast<const T>(&value); }) |
-            std::views::filter([](const T* value) { return value != nullptr; });
+        return m_objects | std::views::values | std::views::transform([](const std::any& value) {
+                   return std::any_cast<const T>(&value);
+               }) |
+               std::views::filter([](const T* value) { return value != nullptr; });
     }
 
     void emitEvent(const Event event) { m_events.push_back(event); }
@@ -75,7 +76,8 @@ public:
 
     [[nodiscard]] bool hasEvent(const EventType type) const {
         // Check if any event.type in range equals type
-        return std::ranges::any_of(m_events, [type](const Event& event) { return event.type == type; });
+        return std::ranges::any_of(m_events,
+                                   [type](const Event& event) { return event.type == type; });
     }
 
     std::optional<Event> pollEvents(EventType type) {
