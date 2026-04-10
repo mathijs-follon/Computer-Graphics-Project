@@ -2,6 +2,9 @@
 build/
 cmake-build-debug/
 
+# logs
+*.log
+
 # IDE
 .idea/
 
