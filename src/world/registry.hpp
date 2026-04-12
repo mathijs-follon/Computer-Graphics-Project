@@ -11,6 +11,8 @@
 
 #include "events.hpp"
 
+#include <filesystem>
+
 class Registry {
 public:
     Registry() = default;
@@ -63,6 +65,23 @@ public:
                std::views::filter([](const T* value) { return value != nullptr; });
     }
 
+    template <typename T>
+    auto getEntries() {
+        return m_objects | std::views::transform([](auto& pair) -> std::pair<std::string_view, T*> {
+                   return {pair.first, std::any_cast<T>(&pair.second)};
+               }) |
+               std::views::filter([](const auto& pair) { return pair.second != nullptr; });
+    }
+
+    template <typename T>
+    auto getEntries() const {
+        return m_objects |
+               std::views::transform([](const auto& pair) -> std::pair<std::string_view, const T*> {
+                   return {pair.first, std::any_cast<const T>(&pair.second)};
+               }) |
+               std::views::filter([](const auto& pair) { return pair.second != nullptr; });
+    }
+
     void emitEvent(const Event event) { m_events.push_back(event); }
 
     template <typename EventPayload>
@@ -74,31 +93,30 @@ public:
         emitEvent(Event{EventTraits<EventPayload>::type, std::move(payload)});
     }
 
-    [[nodiscard]] bool hasEvent(const EventType type) const {
-        // Check if any event.type in range equals type
-        return std::ranges::any_of(m_events,
-                                   [type](const Event& event) { return event.type == type; });
-    }
-
-    std::optional<Event> pollEvents(EventType type) {
+    [[nodiscard]] std::optional<Event> getFrameEvent(const EventType type) const {
         // Find the first matching event on type
         const auto it = std::ranges::find_if(
             m_events, [type](const Event& event) { return event.type == type; });
 
-        // If there was a match then return and erase it
+        // If there was a match then return it
         if (it != m_events.end()) {
             Event event = *it;
-            m_events.erase(it);
             return event;
         }
         return std::nullopt;
     }
 
-    void flushEvents() { m_events.clear(); }
+    void clearFrameEvents() { m_events.clear(); }
 
 private:
     std::unordered_map<std::string, std::any> m_objects;
     std::vector<Event> m_events;
 };
+
+namespace registry {
+inline void eventResetSystem(Registry& reg) {
+    reg.clearFrameEvents();
+}
+}  // namespace registry
 
 #endif  // CG_OPENGL_PROJECT_REGISTRY_H

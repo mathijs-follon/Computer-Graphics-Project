@@ -15,6 +15,9 @@
 |------------|-------|-------|------------|---------------------------------------------------------------------------------|
 | 09-04-2026 | 10:00 | 11:49 |            | Planning en issues / milestones bespreken + architectuur maken (samen met Taru) |
 | 09-04-2026 | 12:19 | 13:15 |            | window (from example) setup en logger                                           |
+| 09-04-2026 | 15:10 | 17:17 |            | Camera system                                                                   |
+| 09-04-2026 | 19:02 | 20:11 |            | Camera system                                                                   |
+| 12-04-2026 | 19:12 | 21:11 |            | Camera system + Simple asset system                                             |
 
 ---
 

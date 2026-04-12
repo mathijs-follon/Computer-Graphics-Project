@@ -10,6 +10,12 @@
 
 #include "world/registry.hpp"
 
+#ifdef DEBUG
+#define ONLY_IF_DEBUG
+#else
+#define ONLY_IF_DEBUG return;
+#endif
+
 #define LOG_INFO(...) ::logger::info(__VA_ARGS__)
 #define LOG_DEBUG(...) ::logger::debug(__FILE__, __LINE__, __VA_ARGS__)
 #define LOG_WARN(...) ::logger::warn(__FILE__, __LINE__, __VA_ARGS__)

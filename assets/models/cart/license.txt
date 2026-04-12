@@ -1,8 +1,0 @@
-Model Information:
-* title:	KexEdit LSM Rollercoaster Trains
-* source:	https://sketchfab.com/3d-models/kexedit-lsm-rollercoaster-trains-79bedd291cfe47268e30040e2da08790
-* author:	Bränninen (https://sketchfab.com/Branninen)
-
-Model License:
-* license type:	SKETCHFAB Standard (https://sketchfab.com/licenses)
-* requirements:	Under basic restrictions, use worldwide, on all types of media, commercially or not, and in all types of derivative works

@@ -84,19 +84,26 @@ endif()
 
 add_executable(CG_OpenGL_Project
         src/main.cpp
-        src/log/log.hpp
         src/log/log.cpp
+        src/log/log.hpp
         src/world/registry.hpp
         src/app/pipeline.hpp
         src/app/app.hpp
-        src/app/app.hpp
-        src/app/app.hpp
-        src/app/pipeline.hpp
         src/app/system.hpp
         src/world/events.hpp
         src/graphics/window.hpp
         src/graphics/camera.hpp
+        src/graphics/geometry.hpp
+        src/app/players.hpp
+        src/asset/asset.hpp
+        src/asset/texture.hpp
+        src/asset/shader.hpp
+        src/asset/model.hpp
+        src/asset/material.hpp
 )
+
+# Remove DEBUG to disable logs to LOG_CONSOLE
+target_compile_definitions(CG_OpenGL_Project PRIVATE DEBUG)
 
 target_include_directories(CG_OpenGL_Project PRIVATE
     src/

@@ -11,6 +11,7 @@ enum class LoopStage {
     Update,
     Render,
     EndFrame,
+    Debug,
 };
 
 enum class InitStage {

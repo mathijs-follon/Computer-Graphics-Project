@@ -1,10 +1,18 @@
 #ifndef CG_OPENGL_PROJECT_APP_HPP
 #define CG_OPENGL_PROJECT_APP_HPP
 #include "pipeline.hpp"
+#include "log/log.hpp"
 #include "world/registry.hpp"
 
 class App {
 public:
+
+    struct Time {
+        double lastFrameTime{0.0};
+        double currentTime{0.0};
+        float deltaTime{0.0};
+    };
+
     App() = default;
 
     Registry& registry() { return m_registry; }
@@ -25,12 +33,8 @@ public:
     void run() {
         m_initPipeline.executePipeline(m_registry);
 
-        while (true) {
+        while (!m_registry.getFrameEvent(EventType::ApplicationExitRequest)) {
             m_loopPipeline.executePipeline(m_registry);
-            if (m_registry.hasEvent(EventType::ApplicationExitRequest)) {
-                break;
-            }
-            m_registry.flushEvents();
         }
 
         m_shutdownPipeline.executePipeline(m_registry);

@@ -48,6 +48,14 @@ inline void setupSystem(Registry& registry) {
 
     registry.registerObject(kMainWindowStateName, WindowState{handle});
 
+    registry.registerObject("app.time", App::Time{});
+
+    if (auto* time = registry.getObject<App::Time>("app.time"); !time) {
+        LOG_ERROR("app.time Time struct was deleted.");
+    } else {
+        time->currentTime = glfwGetTime();
+    }
+
     LOG_INFO("Window ready (OpenGL {}.{})", GLAD_VERSION_MAJOR(gl_version),
              GLAD_VERSION_MINOR(gl_version));
 }
@@ -63,9 +71,19 @@ inline void pollPlatformEventsSystem(Registry& registry) {
     if (glfwWindowShouldClose(windowState->handle) == GLFW_TRUE) {
         registry.emitEvent(ApplicationExitRequest{});
     }
+
+    auto* time = registry.getObject<App::Time>("app.time");
+    if (!time) {
+        LOG_ERROR("app.time Time struct was deleted.");
+        return;
+    }
+
+    time->lastFrameTime = time->currentTime;
+    time->currentTime = glfwGetTime();
+    time->deltaTime = static_cast<float>(time->currentTime - time->lastFrameTime);
 }
 
-inline void renderSystem(Registry&) {
+inline void clearWindowSystem(Registry&) {
     glClearColor(0.15f, 0.18f, 0.22f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
 }
