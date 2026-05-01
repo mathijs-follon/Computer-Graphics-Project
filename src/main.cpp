@@ -1,6 +1,9 @@
 #include "app/app.hpp"
+#include "app/objects/island.hpp"
+#include "graphics/rendering.hpp"
 #include "graphics/camera.hpp"
 #include "graphics/window.hpp"
+#include "log/log.hpp"
 
 void setupInitSystems(App& app) {
     // Setup logger
@@ -9,6 +12,8 @@ void setupInitSystems(App& app) {
     // Setup window
     app.addInitSystem(InitStage::Setup, window::setupSystem);
     app.addInitSystem(InitStage::Setup, camera::setupSystem);
+    app.addInitSystem(InitStage::Setup, rendering::setupSystem);
+    app.addInitSystem(InitStage::Setup, island::setupSystem);
 
 }
 
@@ -28,13 +33,18 @@ void setupLoopSystems(App& app) {
 
     // Rendering
     app.addLoopSystem(LoopStage::Render, window::clearWindowSystem);
+    app.addLoopSystem(LoopStage::Render, rendering::prepareRenderStateSystem);
+    app.addLoopSystem(LoopStage::Render, rendering::gatherCullSortDrawablesSystem);
+    app.addLoopSystem(LoopStage::Render, rendering::drawOpaqueMeshesSystem);
+    app.addLoopSystem(LoopStage::Render, rendering::drawTransparentMeshesSystem);
+    app.addLoopSystem(LoopStage::Render, rendering::endRenderStateSystem);
 
 
     // End
     app.addLoopSystem(LoopStage::EndFrame, window::presentSystem);
 
     // Debug
-    app.addLoopSystem(LoopStage::Debug, camera::debugPrintCameraSystem);
+    // app.addLoopSystem(LoopStage::Debug, camera::debugPrintCameraSystem);
 }
 
 void setupShutdownSystems(App& app) {

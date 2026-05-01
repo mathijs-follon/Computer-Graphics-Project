@@ -29,8 +29,8 @@ struct Camera {
 
     float fovYDeg{60.0f};
     float aspect{16.0f / 9.0f};
-    float nearZ{0.001f};
-    float farZ{8000.0f};
+    float nearZ{0.1f};
+    float farZ{4000.0f};
 
 
     glm::mat4 viewMatrix{1.0f};
@@ -98,9 +98,9 @@ inline void setupSystem(Registry& registry) {
     }
 
     FreeRoamEntity freeRoam{};
-    freeRoam.position = {0.0f, 740.0f, 1080.0f};
+    freeRoam.position = {0.0f, 240.0f, 720.0f};
     freeRoam.yaw = -90.0f;
-    freeRoam.pitch = -30.0f;
+    freeRoam.pitch = 0.0f;
     registry.registerObject(kFreeRoamEntityName, freeRoam);
 
     SlideRiderEntity rider{};
@@ -112,11 +112,13 @@ inline void setupSystem(Registry& registry) {
 
     Camera freeRoamCam{};
     freeRoamCam.fovYDeg = 50.0f;
-    freeRoamCam.farZ = 8000.0f;
+    freeRoamCam.nearZ = 0.1f;
+    freeRoamCam.farZ = 4000.0f;
 
     Camera slideCam{};
     slideCam.fovYDeg = 65.0f;
-    slideCam.farZ = 8000.0f;
+    slideCam.nearZ = 0.1f;
+    slideCam.farZ = 4000.0f;
 
     state.cameras[static_cast<std::size_t>(CameraId::FreeRoam)] = freeRoamCam;
     state.cameras[static_cast<std::size_t>(CameraId::SlideFollow)] = slideCam;

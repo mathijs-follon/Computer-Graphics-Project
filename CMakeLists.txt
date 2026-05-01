@@ -5,10 +5,15 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_SCAN_FOR_MODULES OFF)
 enable_testing()
 
 include(FetchContent)
 find_package(OpenGL REQUIRED)
+
+if(EXISTS "/usr/include/minizip")
+    include_directories(SYSTEM "/usr/include/minizip")
+endif()
 
 set(GLFW_BUILD_DOCS OFF CACHE BOOL "" FORCE)
 set(GLFW_BUILD_TESTS OFF CACHE BOOL "" FORCE)
@@ -21,10 +26,10 @@ set(SPDLOG_BUILD_SHARED OFF CACHE BOOL "" FORCE)
 
 if(NOT EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/third_party/glfw/CMakeLists.txt")
     FetchContent_Declare(
-        glfw
-        GIT_REPOSITORY https://github.com/glfw/glfw.git
-        GIT_TAG 3.4
-        SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/third_party/glfw"
+            glfw
+            GIT_REPOSITORY https://github.com/glfw/glfw.git
+            GIT_TAG 3.4
+            SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/third_party/glfw"
     )
     FetchContent_MakeAvailable(glfw)
 else()
@@ -33,26 +38,27 @@ endif()
 
 if(NOT EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/third_party/spdlog/CMakeLists.txt")
     FetchContent_Declare(
-        spdlog
-        GIT_REPOSITORY https://github.com/gabime/spdlog.git
-        GIT_TAG v1.15.3
-        SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/third_party/spdlog"
+            spdlog
+            GIT_REPOSITORY https://github.com/gabime/spdlog.git
+            GIT_TAG v1.15.3
+            SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/third_party/spdlog"
     )
     FetchContent_MakeAvailable(spdlog)
 else()
     add_subdirectory(third_party/spdlog)
 endif()
 
-if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/third_party/tinygltf/CMakeLists.txt")
-    add_subdirectory(third_party/tinygltf)
-elseif(NOT EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/third_party/tinygltf/tiny_gltf.h")
+if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/third_party/assimp/CMakeLists.txt")
+    set(ASSIMP_WARNINGS_AS_ERRORS OFF CACHE BOOL "" FORCE)
+    add_subdirectory(third_party/assimp)
+else()
+    set(ASSIMP_WARNINGS_AS_ERRORS OFF CACHE BOOL "" FORCE)
     FetchContent_Declare(
-        tinygltf
-        GIT_REPOSITORY https://github.com/syoyo/tinygltf.git
-        GIT_TAG v2.9.3
-        SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/third_party/tinygltf"
+            assimp
+            GIT_REPOSITORY https://github.com/assimp/assimp.git
+            GIT_TAG v5.4.3
     )
-    FetchContent_MakeAvailable(tinygltf)
+    FetchContent_MakeAvailable(assimp)
 endif()
 
 if(NOT EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/third_party/glad/src/gl.c")
@@ -63,20 +69,15 @@ target_include_directories(glad_gl PUBLIC third_party/glad/include)
 
 if(NOT EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/third_party/stb/stb_image.h")
     FetchContent_Declare(
-        stb
-        GIT_REPOSITORY https://github.com/nothings/stb.git
-        GIT_TAG master
-        SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/third_party/stb"
+            stb
+            GIT_REPOSITORY https://github.com/nothings/stb.git
+            GIT_TAG master
+            SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/third_party/stb"
     )
     FetchContent_MakeAvailable(stb)
 endif()
 add_library(stb_image INTERFACE)
 target_include_directories(stb_image INTERFACE third_party/stb)
-
-if(NOT TARGET tinygltf)
-    add_library(tinygltf INTERFACE)
-    target_include_directories(tinygltf INTERFACE third_party/tinygltf)
-endif()
 
 if(MSVC)
     set(PROJECT_WARNING_FLAGS /W4)
@@ -87,6 +88,10 @@ endif()
 add_executable(CG_OpenGL_Project
         src/main.cpp
         src/log/log.cpp
+        src/asset/texture.cpp
+        src/asset/shader.cpp
+        src/asset/model.cpp
+        src/asset/render_object_spawner.cpp
         src/log/log.hpp
         src/world/registry.hpp
         src/app/pipeline.hpp
@@ -96,30 +101,34 @@ add_executable(CG_OpenGL_Project
         src/graphics/window.hpp
         src/graphics/camera.hpp
         src/graphics/geometry.hpp
+        src/graphics/rendering.hpp
         src/app/players.hpp
         src/asset/asset.hpp
+        src/asset/asset_paths.hpp
         src/asset/texture.hpp
         src/asset/shader.hpp
         src/asset/model.hpp
         src/asset/material.hpp
+        src/asset/render_object_spawner.hpp
+        src/app/objects/island.hpp
 )
 
 # Remove DEBUG to disable logs to LOG_CONSOLE
 target_compile_definitions(CG_OpenGL_Project PRIVATE DEBUG)
 
 target_include_directories(CG_OpenGL_Project PRIVATE
-    src/
+        src/
 )
 
 target_compile_options(CG_OpenGL_Project PRIVATE ${PROJECT_WARNING_FLAGS})
 
 target_link_libraries(CG_OpenGL_Project PRIVATE
-    OpenGL::GL
-    glad_gl
-    glfw
-    spdlog::spdlog
-    tinygltf
-    stb_image
+        OpenGL::GL
+        glad_gl
+        glfw
+        spdlog::spdlog
+        assimp
+        stb_image
 )
 
 if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/assets")
@@ -134,13 +143,13 @@ if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/assets")
 endif()
 
 add_executable(template_test
-    tests/template_test.cpp
+        tests/template_test.cpp
 )
 
 target_compile_options(template_test PRIVATE ${PROJECT_WARNING_FLAGS})
 
 add_test(
-    NAME template_test
-    COMMAND template_test
+        NAME template_test
+        COMMAND template_test
 )
 

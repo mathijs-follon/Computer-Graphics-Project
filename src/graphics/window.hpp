@@ -1,6 +1,7 @@
 #ifndef CG_OPENGL_PROJECT_WINDOW_HPP
 #define CG_OPENGL_PROJECT_WINDOW_HPP
-#include <cstdlib>
+
+#include "app/app.hpp"
 
 #include <glad/gl.h>
 #define GLFW_INCLUDE_NONE
@@ -85,7 +86,7 @@ inline void pollPlatformEventsSystem(Registry& registry) {
 
 inline void clearWindowSystem(Registry&) {
     glClearColor(0.15f, 0.18f, 0.22f, 1.0f);
-    glClear(GL_COLOR_BUFFER_BIT);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
 inline void presentSystem(Registry& registry) {
