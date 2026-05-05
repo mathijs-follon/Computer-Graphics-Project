@@ -1,5 +1,6 @@
 #include "app/app.hpp"
 #include "app/objects/island.hpp"
+#include "app/objects/curves.hpp"
 #include "graphics/rendering.hpp"
 #include "graphics/camera.hpp"
 #include "graphics/window.hpp"
@@ -14,15 +15,13 @@ void setupInitSystems(App& app) {
     app.addInitSystem(InitStage::Setup, camera::setupSystem);
     app.addInitSystem(InitStage::Setup, rendering::setupSystem);
     app.addInitSystem(InitStage::Setup, island::setupSystem);
-
+    app.addInitSystem(InitStage::Setup, curves::setupSystem);
 }
 
 void setupLoopSystems(App& app) {
-
     // Events
     app.addLoopSystem(LoopStage::PollEvents, registry::eventResetSystem);
     app.addLoopSystem(LoopStage::PollEvents, window::pollPlatformEventsSystem);
-
 
     // Updating
     app.addLoopSystem(LoopStage::Update, camera::switchSystem);
@@ -30,15 +29,14 @@ void setupLoopSystems(App& app) {
     app.addLoopSystem(LoopStage::Update, camera::syncCamerasFromEntitiesSystem);
     app.addLoopSystem(LoopStage::Update, camera::updateMatricesSystem);
 
-
     // Rendering
     app.addLoopSystem(LoopStage::Render, window::clearWindowSystem);
     app.addLoopSystem(LoopStage::Render, rendering::prepareRenderStateSystem);
     app.addLoopSystem(LoopStage::Render, rendering::gatherCullSortDrawablesSystem);
     app.addLoopSystem(LoopStage::Render, rendering::drawOpaqueMeshesSystem);
     app.addLoopSystem(LoopStage::Render, rendering::drawTransparentMeshesSystem);
+    app.addLoopSystem(LoopStage::Render, rendering::drawWireFrameMeshesSystem);
     app.addLoopSystem(LoopStage::Render, rendering::endRenderStateSystem);
-
 
     // End
     app.addLoopSystem(LoopStage::EndFrame, window::presentSystem);

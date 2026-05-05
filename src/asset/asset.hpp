@@ -45,7 +45,8 @@ public:
         return Model{};
     }
 
-    static ShaderProgram loadShaderProgram(const std::string& vertexPath, const std::string& fragmentPath) {
+    static ShaderProgram loadShaderProgram(const std::string& vertexPath,
+                                           const std::string& fragmentPath) {
         const auto vertexCandidates = fallbackCandidates(vertexPath);
         const auto fragmentCandidates = fallbackCandidates(fragmentPath);
         if (vertexCandidates.empty() || fragmentCandidates.empty()) {
@@ -53,7 +54,8 @@ public:
             return ShaderProgram{};
         }
 
-        if (const auto program = loadShaderProgramFromPaths(vertexCandidates.front(), fragmentCandidates.front());
+        if (const auto program =
+                loadShaderProgramFromPaths(vertexCandidates.front(), fragmentCandidates.front());
             !program.has_value()) {
             LOG_ERROR("Failed to load shader program from: {}, {}", vertexPath, fragmentPath);
             return ShaderProgram{};

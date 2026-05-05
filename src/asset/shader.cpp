@@ -100,7 +100,8 @@ std::optional<ShaderProgram> loadShaderProgramFromPaths(std::string_view vertexS
     program.resource->locView = glGetUniformLocation(programId, "u_view");
     program.resource->locProjection = glGetUniformLocation(programId, "u_projection");
     program.resource->locColor = glGetUniformLocation(programId, "u_color");
-    program.resource->locAlbedo = glGetUniformLocation(programId, "u_albedo"); // the base color / the reflectivity of a surface
+    program.resource->locAlbedo = glGetUniformLocation(
+        programId, "u_albedo");  // the base color / the reflectivity of a surface
     return program;
 }
 

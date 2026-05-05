@@ -3,6 +3,7 @@
 
 #include "graphics/camera.hpp"
 #include "graphics/geometry.hpp"
+#include "log/log.hpp"
 #include "world/registry.hpp"
 
 #include <glad/gl.h>
@@ -36,6 +37,7 @@ enum class RenderLayer : std::uint8_t {
     Opaque = 20,
     AlphaTest = 40,
     Transparent = 60,
+    DebugOverlay = 70,
     Overlay = 100,
 };
 
@@ -93,10 +95,12 @@ struct RenderFrameScratch {
 
     std::vector<DrawRef> opaque;
     std::vector<DrawRef> transparent;
+    std::vector<DrawRef> wireframe;
 
     void clear() {
         opaque.clear();
         transparent.clear();
+        wireframe.clear();
     }
 };
 
@@ -116,7 +120,8 @@ inline void setupSystem(Registry& registry) {
 }
 
 inline bool boundsAreDegenerate(const AABB& bounds) {
-    return bounds.min.x == bounds.max.x && bounds.min.y == bounds.max.y && bounds.min.z == bounds.max.z;
+    return bounds.min.x == bounds.max.x && bounds.min.y == bounds.max.y &&
+           bounds.min.z == bounds.max.z;
 }
 
 inline void prepareRenderStateSystem(Registry&) {
@@ -141,7 +146,8 @@ inline void gatherCullSortDrawablesSystem(Registry& registry) {
     const glm::vec3 cameraPos = cam->position;
 
     for (const RenderMeshInstance* mesh : registry.getObjects<RenderMeshInstance>()) {
-        if (mesh == nullptr || mesh->buffers == nullptr || mesh->buffers->vao == 0U || mesh->shaderProgram == 0U) {
+        if (mesh == nullptr || mesh->buffers == nullptr || mesh->buffers->vao == 0U ||
+            mesh->shaderProgram == 0U) {
             continue;
         }
         const bool drawsIndexed = mesh->indexCount > 0 && mesh->drawArraysVertexCount == 0;
@@ -165,13 +171,16 @@ inline void gatherCullSortDrawablesSystem(Registry& registry) {
         const glm::vec3 worldPos = glm::vec3(worldOrigin) / std::max(worldOrigin.w, 1e-6f);
         const float distance = glm::length(worldPos - cameraPos);
 
-        const glm::vec4 clip = cam->viewProjMatrix * mesh->modelMatrix * glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);
+        const glm::vec4 clip =
+            cam->viewProjMatrix * mesh->modelMatrix * glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);
         const float ndcZ = (std::fabs(clip.w) > 1e-6f) ? (clip.z / clip.w) : 0.0f;
 
         RenderFrameScratch::DrawRef ref{};
         ref.mesh = mesh;
         ref.sortDepth = ndcZ;
-        if (mesh->layer >= RenderLayer::Transparent && mesh->layer < RenderLayer::Overlay) {
+        if (mesh->layer == RenderLayer::DebugOverlay) {
+            scratch->wireframe.push_back(ref);
+        } else if (mesh->layer >= RenderLayer::Transparent && mesh->layer < RenderLayer::Overlay) {
             ref.sortDepth = distance;
             scratch->transparent.push_back(ref);
         } else {
@@ -179,7 +188,8 @@ inline void gatherCullSortDrawablesSystem(Registry& registry) {
         }
     }
 
-    std::ranges::sort(scratch->opaque, [](const RenderFrameScratch::DrawRef& a, const RenderFrameScratch::DrawRef& b) {
+    std::ranges::sort(scratch->opaque, [](const RenderFrameScratch::DrawRef& a,
+                                          const RenderFrameScratch::DrawRef& b) {
         if (a.mesh->layer != b.mesh->layer) {
             return static_cast<int>(a.mesh->layer) < static_cast<int>(b.mesh->layer);
         }
@@ -192,7 +202,8 @@ inline void gatherCullSortDrawablesSystem(Registry& registry) {
         return a.sortDepth < b.sortDepth;
     });
 
-    std::ranges::sort(scratch->transparent, [](const RenderFrameScratch::DrawRef& a, const RenderFrameScratch::DrawRef& b) {
+    std::ranges::sort(scratch->transparent, [](const RenderFrameScratch::DrawRef& a,
+                                               const RenderFrameScratch::DrawRef& b) {
         if (a.mesh->layer != b.mesh->layer) {
             return static_cast<int>(a.mesh->layer) < static_cast<int>(b.mesh->layer);
         }
@@ -200,7 +211,8 @@ inline void gatherCullSortDrawablesSystem(Registry& registry) {
     });
 }
 
-inline void drawMeshList(const std::vector<RenderFrameScratch::DrawRef>& list, const camera::Camera& cam) {
+inline void drawMeshList(const std::vector<RenderFrameScratch::DrawRef>& list,
+                         const camera::Camera& cam) {
     GLuint currentProgram = 0U;
     GLuint currentVao = 0U;
     GLuint currentTexture = 0U;
@@ -285,6 +297,17 @@ inline void drawTransparentMeshesSystem(Registry& registry) {
     glDisable(GL_BLEND);
 }
 
+inline void drawWireFrameMeshesSystem(Registry& registry) {
+    const auto* scratch = frameScratch(registry);
+    const camera::Camera* cam = camera::activeCamera(registry);
+    if (scratch == nullptr || cam == nullptr || scratch->wireframe.empty()) {
+        return;
+    }
+
+    glDisable(GL_BLEND);
+    drawMeshList(scratch->wireframe, *cam);
+};
+
 inline void endRenderStateSystem(Registry&) {
     glBindVertexArray(0);
     glUseProgram(0);
@@ -295,6 +318,7 @@ inline void renderFrameSystem(Registry& registry) {
     gatherCullSortDrawablesSystem(registry);
     drawOpaqueMeshesSystem(registry);
     drawTransparentMeshesSystem(registry);
+    drawWireFrameMeshesSystem(registry);
     endRenderStateSystem(registry);
 }
 

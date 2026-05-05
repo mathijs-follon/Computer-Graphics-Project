@@ -16,7 +16,6 @@
 #include <glm/vec3.hpp>
 
 namespace island {
-
 struct Transform {
     glm::vec3 position{0.0f, -20.0f, -80.0f};
     glm::vec3 rotationDeg{0.0f, 0.0f, 0.0f};
@@ -66,20 +65,25 @@ inline void setupSystem(Registry& registry) {
         }
 
         request.modelPath = candidate;
-        const asset::RenderObjectSpawnResult result = asset::spawnModelAsRenderMeshes(registry, request);
+        const asset::RenderObjectSpawnResult result =
+            asset::spawnModelAsRenderMeshes(registry, request);
         if (!result.error.empty()) {
             LOG_WARN("Island spawn candidate '{}' failed: {}", candidate, result.error);
             continue;
         }
 
         glm::mat4 rotate = glm::mat4(1.0f);
-        rotate = glm::rotate(rotate, glm::radians(kTransform.rotationDeg.x), glm::vec3(1.0f, 0.0f, 0.0f));
-        rotate = glm::rotate(rotate, glm::radians(kTransform.rotationDeg.y), glm::vec3(0.0f, 1.0f, 0.0f));
-        rotate = glm::rotate(rotate, glm::radians(kTransform.rotationDeg.z), glm::vec3(0.0f, 0.0f, 1.0f));
+        rotate = glm::rotate(rotate, glm::radians(kTransform.rotationDeg.x),
+                             glm::vec3(1.0f, 0.0f, 0.0f));
+        rotate = glm::rotate(rotate, glm::radians(kTransform.rotationDeg.y),
+                             glm::vec3(0.0f, 1.0f, 0.0f));
+        rotate = glm::rotate(rotate, glm::radians(kTransform.rotationDeg.z),
+                             glm::vec3(0.0f, 0.0f, 1.0f));
         const glm::mat4 pivotToOrigin = glm::translate(glm::mat4(1.0f), -kTransform.position);
         const glm::mat4 pivotBack = glm::translate(glm::mat4(1.0f), kTransform.position);
         const glm::mat4 worldRotation = pivotBack * rotate * pivotToOrigin;
-        const glm::mat4 worldScale = pivotBack * glm::scale(glm::mat4(1.0f), kTransform.scale) * pivotToOrigin;
+        const glm::mat4 worldScale =
+            pivotBack * glm::scale(glm::mat4(1.0f), kTransform.scale) * pivotToOrigin;
         const glm::mat4 worldTransform = worldRotation * worldScale;
 
         const std::string meshPrefix = request.namePrefix + ".mesh.";
@@ -90,8 +94,8 @@ inline void setupSystem(Registry& registry) {
             mesh->modelMatrix = worldTransform * mesh->modelMatrix;
         }
 
-        LOG_INFO("Spawned '{}' from '{}' ({} meshes, texture={})", request.namePrefix, candidate, result.meshCount,
-                 textureSelectionToString(result.textureSelection));
+        LOG_INFO("Spawned '{}' from '{}' ({} meshes, texture={})", request.namePrefix, candidate,
+                 result.meshCount, textureSelectionToString(result.textureSelection));
         return;
     }
 

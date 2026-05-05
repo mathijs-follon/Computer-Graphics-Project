@@ -1,5 +1,6 @@
 #ifndef CG_OPENGL_PROJECT_GEOMETRY_HPP
 #define CG_OPENGL_PROJECT_GEOMETRY_HPP
+#include "log/log.hpp"
 #include <algorithm>
 #include <array>
 #include <glm/ext/matrix_float3x3.hpp>
@@ -98,14 +99,14 @@ struct Frustum {
     }
 };
 
-struct FrenetFrame {
-    glm::vec3 tangent;
-    glm::vec3 normal;
-    glm::vec3 binormal;
-};
-
 struct CubicBezierCurve {
-    static constexpr glm::mat4 basis{-1, 3, -3, -1, 3, -6, 3, 0, -3, 3, 0, 0, 1, 0, 0, 0};
+    struct FrenetFrame {
+        glm::vec3 tangent;
+        glm::vec3 normal;
+        glm::vec3 binormal;
+    };
+
+    static constexpr glm::mat4 basis{-1, 3, -3, 1, 3, -6, 3, 0, -3, 3, 0, 0, 1, 0, 0, 0};
     const glm::mat4x3 controlPoints{};
     glm::mat4x3 coefficients{0.0};
     std::vector<glm::vec3> samplePoints{};
@@ -169,7 +170,7 @@ struct CubicBezierCurve {
 
             if (!samplePoints.empty()) {
                 arclength += glm::distance(samplePoints.back(), newSample);
-                arcLengthLUT.insert({arclength, dt * sampleCount});
+                arcLengthLUT.insert({arclength, dt * i});
             }
 
             samplePoints.push_back(newSample);

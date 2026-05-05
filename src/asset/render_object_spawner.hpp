@@ -6,6 +6,7 @@
 #include "world/registry.hpp"
 
 #include <cstddef>
+#include <glm/ext/vector_float3.hpp>
 #include <string>
 
 #include <glm/vec3.hpp>
@@ -26,6 +27,9 @@ struct RenderObjectSpawnRequest {
     std::string overrideTexturePath;
     bool useModelMaterialTexture = true;
 
+    bool spawnFromRawVertices = false;
+    std::vector<glm::vec3>* rawVertices = nullptr;
+
     glm::vec3 worldPosition{0.0f, 0.0f, 0.0f};
     float uniformTargetSize = 1.0f;
     bool centerModel = true;
@@ -41,8 +45,8 @@ struct RenderObjectSpawnResult {
     std::string error;
 };
 
-[[nodiscard]] RenderObjectSpawnResult spawnModelAsRenderMeshes(Registry& registry,
-                                                               const RenderObjectSpawnRequest& request);
+[[nodiscard]] RenderObjectSpawnResult
+spawnModelAsRenderMeshes(Registry& registry, const RenderObjectSpawnRequest& request);
 
 }  // namespace asset
 
