@@ -98,6 +98,12 @@ struct Frustum {
     }
 };
 
+struct FrenetFrame {
+    glm::vec3 tangent;
+    glm::vec3 normal;
+    glm::vec3 binormal;
+};
+
 struct CubicBezierCurve {
     static constexpr glm::mat4 basis{-1, 3, -3, -1, 3, -6, 3, 0, -3, 3, 0, 0, 1, 0, 0, 0};
     const glm::mat4x3 controlPoints{};
@@ -194,18 +200,13 @@ struct CubicBezierCurve {
         return controlPoints * basis * tVec;
     }
 
-    [[nodiscard]] glm::vec3 tangentAt(double t) const {
+    [[nodiscard]] FrenetFrame frenetFrameAt(double t) const {
         glm::vec4 tderVec = glm::vec4(3 * t * t, 2 * t, 1, 0);
-        return glm::normalize(controlPoints * basis * tderVec);
-    }
-
-    [[nodiscard]] glm::vec3 normalAt(double t) const {
         glm::vec4 tder2Vec = glm::vec4(6 * t, 2, 0, 0);
-        return glm::normalize(controlPoints * basis * tder2Vec);
-    }
+        glm::vec3 tangent = glm::normalize(controlPoints * basis * tderVec);
+        glm::vec3 normal = glm::normalize(controlPoints * basis * tder2Vec);
 
-    [[nodiscard]] glm::vec3 binormalAt(double t) const {
-        return glm::cross(tangentAt(t), normalAt(t));
+        return FrenetFrame{tangent, normal, glm::cross(tangent, normal)};
     }
 };
 #endif  // CG_OPENGL_PROJECT_GEOMETRY_HPP
