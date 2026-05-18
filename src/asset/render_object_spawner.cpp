@@ -92,7 +92,7 @@ struct SpawnAssets {
     const std::filesystem::path vertPath = resolveAssetPath(request.vertexShaderPath);
     const std::filesystem::path fragPath = resolveAssetPath(request.fragmentShaderPath);
 
-    if (!request.spawnFromRawVertices) {
+    if (!request.spawnFromRawVertices && !request.spawnFromRawMesh) {
         assets.model = AssetLoader::loadModel(modelPath.string());
         if (assets.model.meshes.empty()) {
             error = "Model has no meshes: " + modelPath.string();
@@ -290,7 +290,108 @@ buildGpuRawMeshInstances(const SpawnAssets& assets, const std::vector<glm::vec3>
     out.push_back(std::move(instance));
 
     return out;
-};
+}
+
+[[nodiscard]] glm::mat4 buildIdentityWorldModelMatrix(const std::vector<rendering::GpuVertex>& vertices,
+                                                      const RenderObjectSpawnRequest& request) {
+    glm::vec3 boundsMin(std::numeric_limits<float>::max());
+    glm::vec3 boundsMax(std::numeric_limits<float>::lowest());
+    for (const rendering::GpuVertex& vertex : vertices) {
+        const glm::vec3 position{vertex.px, vertex.py, vertex.pz};
+        boundsMin = glm::min(boundsMin, position);
+        boundsMax = glm::max(boundsMax, position);
+    }
+    const glm::vec3 center = 0.5f * (boundsMin + boundsMax);
+    const glm::vec3 extent = boundsMax - boundsMin;
+    const float maxExtent = std::max({extent.x, extent.y, extent.z, 1.0e-4f});
+    const float uniformScale = request.uniformTargetSize / maxExtent;
+
+    glm::mat4 modelMatrix = glm::translate(glm::mat4(1.0f), request.worldPosition) *
+                            glm::scale(glm::mat4(1.0f), glm::vec3(uniformScale));
+    if (request.centerModel) {
+        modelMatrix = modelMatrix * glm::translate(glm::mat4(1.0f), -center);
+    }
+    return modelMatrix;
+}
+
+std::vector<rendering::RenderMeshInstance>
+buildGpuRawIndexedMeshInstances(const SpawnAssets& assets,
+                                const std::vector<rendering::GpuVertex>* rawMeshVertices,
+                                const std::vector<std::uint32_t>* rawMeshIndices,
+                                const RenderObjectSpawnRequest& request) {
+    std::vector<rendering::RenderMeshInstance> out;
+    if (rawMeshVertices == nullptr || rawMeshIndices == nullptr || rawMeshVertices->empty() ||
+        rawMeshIndices->empty()) {
+        return out;
+    }
+
+    const glm::mat4 modelMatrix = buildIdentityWorldModelMatrix(*rawMeshVertices, request);
+
+    auto buffers = std::make_shared<rendering::RenderMeshInstance::MeshBuffers>();
+    glGenVertexArrays(1, &buffers->vao);
+    glGenBuffers(1, &buffers->vbo);
+    glGenBuffers(1, &buffers->ebo);
+    if (buffers->vao == 0U || buffers->vbo == 0U || buffers->ebo == 0U) {
+        LOG_ERROR("OpenGL buffer creation failed for object '{}'", request.namePrefix);
+        return out;
+    }
+
+    glBindVertexArray(buffers->vao);
+    glBindBuffer(GL_ARRAY_BUFFER, buffers->vbo);
+    glBufferData(GL_ARRAY_BUFFER,
+                 static_cast<GLsizeiptr>(rawMeshVertices->size() * sizeof(rendering::GpuVertex)),
+                 rawMeshVertices->data(), GL_STATIC_DRAW);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buffers->ebo);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER,
+                 static_cast<GLsizeiptr>(rawMeshIndices->size() * sizeof(std::uint32_t)),
+                 rawMeshIndices->data(), GL_STATIC_DRAW);
+
+    constexpr GLsizei stride = sizeof(rendering::GpuVertex);
+    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, stride, (void*)0);
+    glEnableVertexAttribArray(1);
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, stride, (void*)(3 * sizeof(float)));
+    glEnableVertexAttribArray(2);
+    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, stride, (void*)(6 * sizeof(float)));
+    glBindVertexArray(0);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+
+    glm::vec3 meshMin(std::numeric_limits<float>::max());
+    glm::vec3 meshMax(std::numeric_limits<float>::lowest());
+    for (const rendering::GpuVertex& vertex : *rawMeshVertices) {
+        const glm::vec3 position{vertex.px, vertex.py, vertex.pz};
+        meshMin = glm::min(meshMin, position);
+        meshMax = glm::max(meshMax, position);
+    }
+
+    static Texture generatedWhiteTexture{};
+    Texture diffuseTexture{};
+    if (assets.overrideTexture.textureHdl != 0U) {
+        diffuseTexture = assets.overrideTexture;
+    } else {
+        if (generatedWhiteTexture.textureHdl == 0U) {
+            generatedWhiteTexture = createSolidWhiteTexture();
+        }
+        diffuseTexture = generatedWhiteTexture;
+    }
+
+    rendering::RenderMeshInstance instance{};
+    instance.buffers = std::move(buffers);
+    instance.indexCount = static_cast<GLsizei>(rawMeshIndices->size());
+    instance.shaderProgram = assets.program.id;
+    instance.shaderLifetime = assets.program.resource;
+    instance.locMvp = assets.program.resource ? assets.program.resource->locMvp : -1;
+    instance.locModel = assets.program.resource ? assets.program.resource->locModel : -1;
+    instance.locAlbedo = assets.program.resource ? assets.program.resource->locAlbedo : -1;
+    instance.modelMatrix = modelMatrix;
+    instance.diffuseTexture = diffuseTexture.textureHdl;
+    instance.layer = request.layer;
+    instance.modelBounds = AABB{meshMin, meshMax};
+    instance.useFrustumCull = request.enableFrustumCull;
+    out.push_back(std::move(instance));
+    return out;
+}
 
 std::size_t registerSpawnedMeshes(Registry& registry, const std::string& namePrefix,
                                   std::vector<rendering::RenderMeshInstance>&& instances) {
@@ -314,9 +415,15 @@ RenderObjectSpawnResult spawnModelAsRenderMeshes(Registry& registry,
     }
     result.programId = assetsOpt->program.id;
 
-    auto built = (request.spawnFromRawVertices)
-                     ? buildGpuRawMeshInstances(*assetsOpt, request.rawVertices, request)
-                     : buildGpuMeshInstances(*assetsOpt, request, result.textureSelection);
+    std::vector<rendering::RenderMeshInstance> built;
+    if (request.spawnFromRawMesh) {
+        built = buildGpuRawIndexedMeshInstances(*assetsOpt, request.rawMeshVertices,
+                                                request.rawMeshIndices, request);
+    } else if (request.spawnFromRawVertices) {
+        built = buildGpuRawMeshInstances(*assetsOpt, request.rawVertices, request);
+    } else {
+        built = buildGpuMeshInstances(*assetsOpt, request, result.textureSelection);
+    }
 
     result.meshCount = registerSpawnedMeshes(registry, request.namePrefix, std::move(built));
     if (result.meshCount == 0U) {

@@ -1,6 +1,7 @@
 #ifndef CG_OPENGL_PROJECT_ISLAND_HPP
 #define CG_OPENGL_PROJECT_ISLAND_HPP
 
+#include "asset/asset.hpp"
 #include "asset/asset_paths.hpp"
 #include "asset/render_object_spawner.hpp"
 #include "graphics/rendering.hpp"
@@ -22,6 +23,43 @@ struct Transform {
     glm::vec3 scale{2.0f, 2.0f, 2.0f};
     float uniformTargetSize = 1200.0f;
 };
+
+inline bool isIslandWaterMeshName(const std::string_view meshName) {
+    return meshName.starts_with("Sea");
+}
+
+inline void applyWaterShaderToIslandMeshes(Registry& registry, const std::string_view namePrefix,
+                                           const asset::Model& model,
+                                           const asset::ShaderProgram& waterProgram) {
+    if (waterProgram.id == 0U || waterProgram.resource == nullptr) {
+        return;
+    }
+
+    const std::string meshKeyPrefix = std::string(namePrefix) + ".mesh.";
+    for (std::size_t meshIndex = 0; meshIndex < model.meshes.size(); ++meshIndex) {
+        if (!isIslandWaterMeshName(model.meshes[meshIndex].name)) {
+            continue;
+        }
+
+        auto* mesh =
+            registry.getObject<rendering::RenderMeshInstance>(meshKeyPrefix + std::to_string(meshIndex));
+        if (mesh == nullptr) {
+            continue;
+        }
+
+        mesh->shaderProgram = waterProgram.id;
+        mesh->shaderLifetime = waterProgram.resource;
+        mesh->locMvp = waterProgram.resource->locMvp;
+        mesh->locModel = waterProgram.resource->locModel;
+        mesh->locView = waterProgram.resource->locView;
+        mesh->locProjection = waterProgram.resource->locProjection;
+        mesh->locColor = waterProgram.resource->locColor;
+        mesh->locAlbedo = waterProgram.resource->locAlbedo;
+        mesh->layer = rendering::RenderLayer::Transparent;
+        mesh->transparentDepthBias = true;
+        mesh->useFrustumCull = false;
+    }
+}
 
 inline const char* textureSelectionToString(const asset::TextureSelection selection) {
     switch (selection) {
@@ -93,6 +131,11 @@ inline void setupSystem(Registry& registry) {
             }
             mesh->modelMatrix = worldTransform * mesh->modelMatrix;
         }
+
+        const asset::Model islandModel = asset::AssetLoader::loadModel(candidate);
+        const asset::ShaderProgram waterProgram = asset::AssetLoader::loadShaderProgram(
+            "assets/shaders/water.vert", "assets/shaders/water.frag");
+        applyWaterShaderToIslandMeshes(registry, request.namePrefix, islandModel, waterProgram);
 
         LOG_INFO("Spawned '{}' from '{}' ({} meshes, texture={})", request.namePrefix, candidate,
                  result.meshCount, textureSelectionToString(result.textureSelection));

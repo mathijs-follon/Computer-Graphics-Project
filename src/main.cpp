@@ -1,6 +1,6 @@
 #include "app/app.hpp"
 #include "app/objects/island.hpp"
-#include "app/objects/curves.hpp"
+#include "app/objects/glijbaan.hpp"
 #include "graphics/rendering.hpp"
 #include "graphics/camera.hpp"
 #include "graphics/window.hpp"
@@ -15,7 +15,7 @@ void setupInitSystems(App& app) {
     app.addInitSystem(InitStage::Setup, camera::setupSystem);
     app.addInitSystem(InitStage::Setup, rendering::setupSystem);
     app.addInitSystem(InitStage::Setup, island::setupSystem);
-    app.addInitSystem(InitStage::Setup, curves::setupSystem);
+    app.addInitSystem(InitStage::Setup, glijbaan::setupSystem);
 }
 
 void setupLoopSystems(App& app) {
@@ -26,6 +26,8 @@ void setupLoopSystems(App& app) {
     // Updating
     app.addLoopSystem(LoopStage::Update, camera::switchSystem);
     app.addLoopSystem(LoopStage::Update, camera::inputSystem);
+    app.addLoopSystem(LoopStage::Update, glijbaan::inputSystem);
+    app.addLoopSystem(LoopStage::Update, glijbaan::rideSystem);
     app.addLoopSystem(LoopStage::Update, camera::syncCamerasFromEntitiesSystem);
     app.addLoopSystem(LoopStage::Update, camera::updateMatricesSystem);
 
@@ -43,6 +45,7 @@ void setupLoopSystems(App& app) {
 
     // Debug
     // app.addLoopSystem(LoopStage::Debug, camera::debugPrintCameraSystem);
+    // app.addLoopSystem(LoopStage::EndFrame, camera::coordDebugSystem);  // glijbaan control-point capture
 }
 
 void setupShutdownSystems(App& app) {

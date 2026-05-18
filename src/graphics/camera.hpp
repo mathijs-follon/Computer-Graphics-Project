@@ -116,7 +116,7 @@ inline void setupSystem(Registry& registry) {
     freeRoamCam.farZ = 4000.0f;
 
     Camera slideCam{};
-    slideCam.fovYDeg = 65.0f;
+    slideCam.fovYDeg = rider.fovYDeg;
     slideCam.nearZ = 0.1f;
     slideCam.farZ = 4000.0f;
 
@@ -214,6 +214,22 @@ inline void inputSystem(Registry& registry) {
     }
 }
 
+inline void coordDebugSystem(Registry& registry) {
+    const auto* windowState = registry.getObject<window::WindowState>(window::kMainWindowStateName);
+    if (windowState == nullptr || windowState->handle == nullptr) {
+        return;
+    }
+
+    static bool pWasPressed = false;
+    const bool pPressed = glfwGetKey(windowState->handle, GLFW_KEY_P) == GLFW_PRESS;
+    if (pPressed && !pWasPressed) {
+        if (const Camera* cam = activeCamera(registry); cam != nullptr) {
+            LOG_INFO("Active camera position: {}, {}, {}",
+                     cam->position.x, cam->position.y, cam->position.z);
+        }
+    }
+    pWasPressed = pPressed;
+}
 
 inline void switchSystem(Registry& registry) {
     auto* cameraState = registry.getObject<CameraState>(kCameraStateName);
@@ -248,8 +264,14 @@ inline void syncCamerasFromEntitiesSystem(Registry& registry) {
 
     if (const auto* rider = registry.getObject<SlideRiderEntity>(kSlideRiderEntityName)) {
         auto& camera = cameraState->cameras[static_cast<std::size_t>(CameraId::SlideFollow)];
-        camera.position = rider->position;
-        forwardToYawPitchDegrees(rider->forward, camera.yaw, camera.pitch);
+        const glm::vec3 lookForward = glm::normalize(rider->forward);
+        const glm::vec3 trackUp = glm::length(rider->trackNormal) > 1e-6f
+                                      ? glm::normalize(rider->trackNormal)
+                                      : glm::vec3{0.0f, 1.0f, 0.0f};
+        camera.position =
+            rider->position + trackUp * rider->eyeHeight + lookForward * rider->eyeForward;
+        camera.fovYDeg = rider->fovYDeg;
+        forwardToYawPitchDegrees(lookForward, camera.yaw, camera.pitch);
     }
 }
 

@@ -30,6 +30,10 @@ struct RenderObjectSpawnRequest {
     bool spawnFromRawVertices = false;
     std::vector<glm::vec3>* rawVertices = nullptr;
 
+    bool spawnFromRawMesh = false;
+    std::vector<rendering::GpuVertex>* rawMeshVertices = nullptr;
+    std::vector<std::uint32_t>* rawMeshIndices = nullptr;
+
     glm::vec3 worldPosition{0.0f, 0.0f, 0.0f};
     float uniformTargetSize = 1.0f;
     bool centerModel = true;

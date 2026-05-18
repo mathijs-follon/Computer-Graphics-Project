@@ -80,6 +80,7 @@ struct RenderMeshInstance {
 
     AABB modelBounds{{0.0f, 0.0f, 0.0f}, {0.0f, 0.0f, 0.0f}};
     bool useFrustumCull = true;
+    bool transparentDepthBias = false;
 
     GLsizei drawArraysVertexCount = 0;
     GLenum drawArraysPrimitive = GL_LINES;
@@ -212,15 +213,27 @@ inline void gatherCullSortDrawablesSystem(Registry& registry) {
 }
 
 inline void drawMeshList(const std::vector<RenderFrameScratch::DrawRef>& list,
-                         const camera::Camera& cam) {
+                         const camera::Camera& cam, const bool applyTransparentDepthBias = false) {
     GLuint currentProgram = 0U;
     GLuint currentVao = 0U;
     GLuint currentTexture = 0U;
+    bool polygonOffsetEnabled = false;
 
     for (const RenderFrameScratch::DrawRef& ref : list) {
         const RenderMeshInstance* mesh = ref.mesh;
         if (mesh == nullptr) {
             continue;
+        }
+
+        if (applyTransparentDepthBias && mesh->transparentDepthBias) {
+            if (!polygonOffsetEnabled) {
+                glEnable(GL_POLYGON_OFFSET_FILL);
+                glPolygonOffset(-2.0f, -4.0f);
+                polygonOffsetEnabled = true;
+            }
+        } else if (polygonOffsetEnabled) {
+            glDisable(GL_POLYGON_OFFSET_FILL);
+            polygonOffsetEnabled = false;
         }
 
         if (mesh->shaderProgram != currentProgram) {
@@ -267,6 +280,10 @@ inline void drawMeshList(const std::vector<RenderFrameScratch::DrawRef>& list,
         glDrawElements(GL_TRIANGLES, mesh->indexCount, mesh->indexType, mesh->indexOffset);
     }
 
+    if (polygonOffsetEnabled) {
+        glDisable(GL_POLYGON_OFFSET_FILL);
+    }
+
     glBindVertexArray(0);
     glUseProgram(0);
 }
@@ -292,7 +309,7 @@ inline void drawTransparentMeshesSystem(Registry& registry) {
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glDepthMask(GL_FALSE);
-    drawMeshList(scratch->transparent, *cam);
+    drawMeshList(scratch->transparent, *cam, true);
     glDepthMask(GL_TRUE);
     glDisable(GL_BLEND);
 }

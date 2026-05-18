@@ -22,8 +22,15 @@ struct FreeRoamEntity {
 };
 
 struct SlideRiderEntity {
-    glm::vec3 position{140.0f, 435.0f, -207.0f};
-    glm::vec3 forward{0.0f, -0.15f, -1.0f};
+    glm::vec3 position{0.0f};
+    glm::vec3 forward{0.0f, 0.0f, 1.0f};
+    glm::vec3 trackNormal{0.0f, 1.0f, 0.0f};
+    float seatOffsetAlongNormal = 5.0f;
+    float eyeHeight = 20.0f;
+    float eyeForward = 30.0f;
+    float fovYDeg = 120.0f;
+    float modelYawCorrectionDeg = 0.0f;
+    float modelPitchCorrectionDeg = 0.0f;
 };
 
 

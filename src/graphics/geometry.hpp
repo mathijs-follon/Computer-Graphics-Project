@@ -131,67 +131,67 @@ struct CubicBezierCurve {
         arcLengthLUT.clear();
         samplePoints.clear();
 
-        // !TODO: do this nice with matrices
-        double x = coefficients[3][0];
-        double dx = coefficients[0][0] * dt * dt * dt + coefficients[1][0] * dt * dt +
-                    coefficients[2][0] * dt;
-        double dx2 = 6 * coefficients[0][0] * dt * dt * dt + 2 * coefficients[1][0] * dt * dt;
-        double dx3 = 6 * coefficients[0][0] * dt * dt * dt;
+        const float dt2 = static_cast<float>(dt * dt);
+        const float dt3 = static_cast<float>(dt * dt * dt);
+        const glm::vec4 t0{0.0f, 0.0f, 0.0f, 1.0f};
+        const glm::vec4 t1{dt3, dt2, static_cast<float>(dt), 0.0f};
+        const glm::vec4 t2{6.0f * dt3, 2.0f * dt2, 0.0f, 0.0f};
+        const glm::vec4 t3{6.0f * dt3, 0.0f, 0.0f, 0.0f};
 
-        double y = coefficients[3][1];
-        double dy = coefficients[0][1] * dt * dt * dt + coefficients[1][1] * dt * dt +
-                    coefficients[2][1] * dt;
-        double dy2 = 6 * coefficients[0][1] * dt * dt * dt + 2 * coefficients[1][1] * dt * dt;
-        double dy3 = 6 * coefficients[0][1] * dt * dt * dt;
+        glm::vec3 position = coefficients * t0;
+        glm::vec3 delta = coefficients * t1;
+        glm::vec3 delta2 = coefficients * t2;
+        const glm::vec3 delta3 = coefficients * t3;
 
-        double z = coefficients[3][2];
-        double dz = coefficients[0][2] * dt * dt * dt + coefficients[1][2] * dt * dt +
-                    coefficients[2][2] * dt;
-        double dz2 = 6 * coefficients[0][2] * dt * dt * dt + 2 * coefficients[1][2] * dt * dt;
-        double dz3 = 6 * coefficients[0][2] * dt * dt * dt;
-
-        samplePoints.push_back(glm::vec3(x, y, z));
+        samplePoints.push_back(position);
+        arcLengthLUT.insert({0.0, 0.0});
 
         double arclength{};
         for (uint i = 0; i < sampleCount; i++) {
-            x += dx;
-            dx += dx2;
-            dx2 += dx3;
+            position += delta;
+            delta += delta2;
+            delta2 += delta3;
 
-            y += dy;
-            dy += dy2;
-            dy2 += dy3;
-
-            z += dz;
-            dz += dz2;
-            dz2 += dz3;
-
-            glm::vec3 newSample(x, y, z);
-
-            if (!samplePoints.empty()) {
-                arclength += glm::distance(samplePoints.back(), newSample);
-                arcLengthLUT.insert({arclength, dt * i});
-            }
-
-            samplePoints.push_back(newSample);
+            arclength += glm::distance(samplePoints.back(), position);
+            const double t = static_cast<double>(i + 1) / static_cast<double>(sampleCount);
+            arcLengthLUT.insert({arclength, t});
+            samplePoints.push_back(position);
         }
     }
 
-    [[nodiscard]] std::optional<double> tvalueForDistance(double d) {
+    [[nodiscard]] std::optional<double> tvalueForDistance(double d) const {
+        if (arcLengthLUT.empty()) {
+            return std::nullopt;
+        }
+
+        if (d <= arcLengthLUT.begin()->first) {
+            return arcLengthLUT.begin()->second;
+        }
+
+        const double maxDistance = arcLengthLUT.rbegin()->first;
+        if (d >= maxDistance) {
+            return 1.0;
+        }
+
         auto upperBound = arcLengthLUT.upper_bound(d);
+        if (upperBound == arcLengthLUT.end()) {
+            return 1.0;
+        }
 
-        // given d is beyond d values in LUT
-        if (upperBound == arcLengthLUT.end())
-            return std::nullopt;
+        const double upperDistance = upperBound->first;
+        const double upperT = upperBound->second;
 
-        double upperDistance = upperBound->first;
-        double upperT = upperBound->second;
+        if (upperBound == arcLengthLUT.begin()) {
+            return upperT;
+        }
 
-        if (--upperBound == arcLengthLUT.begin())
-            return std::nullopt;
+        const auto lowerBound = std::prev(upperBound);
+        const double lowerDistance = lowerBound->first;
+        const double lowerT = lowerBound->second;
 
-        double lowerDistance = (upperBound)->first;
-        double lowerT = upperBound->second;
+        if (upperDistance - lowerDistance < 1e-10) {
+            return upperT;
+        }
 
         return lowerT + ((d - lowerDistance) / (upperDistance - lowerDistance)) * (upperT - lowerT);
     }
@@ -199,6 +199,11 @@ struct CubicBezierCurve {
     [[nodiscard]] glm::vec3 pointAt(double t) const {
         glm::vec4 tVec = glm::vec4(t * t * t, t * t, t, 1);
         return controlPoints * basis * tVec;
+    }
+
+    [[nodiscard]] glm::vec3 tangentAt(double t) const {
+        glm::vec4 tderVec = glm::vec4(3 * t * t, 2 * t, 1, 0);
+        return controlPoints * basis * tderVec;
     }
 
     [[nodiscard]] FrenetFrame frenetFrameAt(double t) const {

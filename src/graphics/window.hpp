@@ -57,6 +57,13 @@ inline void setupSystem(Registry& registry) {
         time->currentTime = glfwGetTime();
     }
 
+    int fbWidth{0};
+    int fbHeight{0};
+    glfwGetFramebufferSize(handle, &fbWidth, &fbHeight);
+    if (fbWidth > 0 && fbHeight > 0) {
+        glViewport(0, 0, fbWidth, fbHeight);
+    }
+
     LOG_INFO("Window ready (OpenGL {}.{})", GLAD_VERSION_MAJOR(gl_version),
              GLAD_VERSION_MINOR(gl_version));
 }
@@ -84,7 +91,17 @@ inline void pollPlatformEventsSystem(Registry& registry) {
     time->deltaTime = static_cast<float>(time->currentTime - time->lastFrameTime);
 }
 
-inline void clearWindowSystem(Registry&) {
+inline void clearWindowSystem(Registry& registry) {
+    const auto* windowState = registry.getObject<WindowState>(kMainWindowStateName);
+    if (windowState != nullptr && windowState->handle != nullptr) {
+        int width{0};
+        int height{0};
+        glfwGetFramebufferSize(windowState->handle, &width, &height);
+        if (width > 0 && height > 0) {
+            glViewport(0, 0, width, height);
+        }
+    }
+
     glClearColor(0.15f, 0.18f, 0.22f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }

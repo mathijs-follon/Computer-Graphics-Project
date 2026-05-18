@@ -1,0 +1,11 @@
+Model Information:
+* title:	Dinosaur
+* source:	https://sketchfab.com/3d-models/dinosaur-c743536f3c8e48049a00f19c8f8f6d4a
+* author:	Q*Bert Reynolds (https://sketchfab.com/318arcade)
+
+Model License:
+* license type:	CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+* requirements:	Author must be credited. Commercial use is allowed.
+
+If you use this 3D model in your project be sure to copy paste this credit wherever you share it:
+This work is based on "Dinosaur" (https://sketchfab.com/3d-models/dinosaur-c743536f3c8e48049a00f19c8f8f6d4a) by Q*Bert Reynolds (https://sketchfab.com/318arcade) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)

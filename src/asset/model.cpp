@@ -151,7 +151,7 @@ std::optional<Model> loadModelFromPath(std::string_view path) {
     }
 
     std::vector<glm::mat4> meshWorld(scene->mNumMeshes, glm::mat4(1.0f));
-    // Mesh-transforms uit de scene-hiërarchie verzamelen om vertices naar world te bakken.
+    // Mesh-transforms uit de scene-hierarchie verzamelen om vertices naar world te bakken.
     collectMeshWorldFromRoot(scene->mRootNode, glm::mat4(1.0f), meshWorld);
 
     model.meshes.reserve(scene->mNumMeshes);
