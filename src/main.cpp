@@ -1,5 +1,8 @@
 #include "app/app.hpp"
+#include "app/bloom.hpp"
 #include "app/chroma.hpp"
+#include "app/crosshair.hpp"
+#include "app/interactive_lights.hpp"
 #include "app/objects/island.hpp"
 #include "app/objects/glijbaan.hpp"
 #include "app/objects/lights.hpp"
@@ -20,6 +23,9 @@ void setupInitSystems(App& app) {
     app.addInitSystem(InitStage::Setup, glijbaan::setupSystem);
     app.addInitSystem(InitStage::Setup, chroma::setupSystem);
     app.addInitSystem(InitStage::Setup, lights::setupSystem);
+    app.addInitSystem(InitStage::Setup, interactive_lights::setupSystem);
+    app.addInitSystem(InitStage::Setup, bloom::setupSystem);
+    app.addInitSystem(InitStage::Setup, crosshair::setupSystem);
 }
 
 void setupLoopSystems(App& app) {
@@ -33,17 +39,27 @@ void setupLoopSystems(App& app) {
     app.addLoopSystem(LoopStage::Update, glijbaan::inputSystem);
     app.addLoopSystem(LoopStage::Update, glijbaan::rideSystem);
     app.addLoopSystem(LoopStage::Update, chroma::inputSystem);
+    app.addLoopSystem(LoopStage::Update, bloom::inputSystem);
+    // Picking runs after camera::inputSystem so it sees the up-to-date
+    // cursorCaptured flag; only fires when the cursor is captured.
+    app.addLoopSystem(LoopStage::Update, interactive_lights::inputSystem);
     app.addLoopSystem(LoopStage::Update, camera::syncCamerasFromEntitiesSystem);
     app.addLoopSystem(LoopStage::Update, camera::updateMatricesSystem);
 
     // Rendering
     app.addLoopSystem(LoopStage::Render, window::clearWindowSystem);
+    app.addLoopSystem(LoopStage::Render, bloom::beginScenePassSystem);
     app.addLoopSystem(LoopStage::Render, rendering::prepareRenderStateSystem);
     app.addLoopSystem(LoopStage::Render, rendering::gatherCullSortDrawablesSystem);
     app.addLoopSystem(LoopStage::Render, rendering::drawOpaqueMeshesSystem);
     app.addLoopSystem(LoopStage::Render, rendering::drawTransparentMeshesSystem);
     app.addLoopSystem(LoopStage::Render, rendering::drawWireFrameMeshesSystem);
+    // Sphere lights draw before chroma + bloom so they end up in the HDR scene
+    // FBO and bloom their emissive color.
+    app.addLoopSystem(LoopStage::Render, interactive_lights::renderSystem);
     app.addLoopSystem(LoopStage::Render, chroma::renderSystem);
+    app.addLoopSystem(LoopStage::Render, bloom::postProcessSystem);
+    app.addLoopSystem(LoopStage::Render, crosshair::renderSystem);
     app.addLoopSystem(LoopStage::Render, rendering::endRenderStateSystem);
 
     // End

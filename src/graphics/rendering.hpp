@@ -267,18 +267,18 @@ inline void drawMeshList(const std::vector<RenderFrameScratch::DrawRef>& list,
             glUniform3fv(mesh->locViewPos, 1, glm::value_ptr(cam.position));
         }
 
-        // if (mesh->locMaterialAmbient >= 0) {
-        //     glUniform3fv(mesh->locMaterialAmbient, 1, mesh->material.baseColorFactor.data());
-        // }
-        // if (mesh->locMaterialDiffuse >= 0) {
-        //     glUniform3fv(mesh->locMaterialAmbient, 1, mesh->material.emissiveFactor.data());
-        // }
-        // if (mesh->locMaterialShininess >= 0) {
-        //     glUniform1f(mesh->locMaterialAmbient, mesh->material.shininess);
-        // }
-        // if (mesh->locMaterialSpecular >= 0) {
-        //     glUniform3fv(mesh->locMaterialAmbient, 1, mesh->material.emissiveFactor.data());
-        // }
+        if (mesh->locMaterialAmbient >= 0) {
+            glUniform3fv(mesh->locMaterialAmbient, 1, mesh->material.baseColorFactor.data());
+        }
+        if (mesh->locMaterialDiffuse >= 0) {
+            glUniform3fv(mesh->locMaterialDiffuse, 1, mesh->material.baseColorFactor.data());
+        }
+        if (mesh->locMaterialSpecular >= 0) {
+            glUniform3fv(mesh->locMaterialSpecular, 1, mesh->material.emissiveFactor.data());
+        }
+        if (mesh->locMaterialShininess >= 0) {
+            glUniform1f(mesh->locMaterialShininess, mesh->material.shininess);
+        }
 
         if (mesh->buffers->vao != currentVao) {
             glBindVertexArray(mesh->buffers->vao);

@@ -65,7 +65,9 @@ void main() {
     vec3 viewDir = normalize(u_viewPos - v_frag_pos);
     vec3 n = normalize(v_worldNormal);
 
-    vec3 shaded = vec3(0.0);
+    // Sky/bounce ambient so shadow-side surfaces never collapse to near-black with
+    // only a single grazing sun. Tinted neutral so it doesn't fight the per-light colour.
+    vec3 shaded = vec3(0.18);
     for (int i = 0; i < LIGHT_COUNT_MAX; i++) {
         if (u_lights[i].on == 1) {
             shaded += addPointLighting(u_lights[i], n, viewDir); 

@@ -9,11 +9,11 @@
 
 #include "app/app.hpp"
 #include "asset/asset.hpp"
+#include "graphics/screen_quad.hpp"
 #include "graphics/window.hpp"
 #include "log/log.hpp"
 #include "world/registry.hpp"
 
-#include <array>
 #include <cstdint>
 #include <memory>
 
@@ -36,37 +36,13 @@ enum class OverlayMode : std::uint8_t {
     ChromaKeyed = 2,
 };
 
-struct GpuResources {
-    GLuint vao = 0U;
-    GLuint vbo = 0U;
-    GLuint ebo = 0U;
-
-    GpuResources() = default;
-    GpuResources(const GpuResources&) = delete;
-    GpuResources& operator=(const GpuResources&) = delete;
-    GpuResources(GpuResources&&) = delete;
-    GpuResources& operator=(GpuResources&&) = delete;
-
-    ~GpuResources() {
-        if (ebo != 0U) {
-            glDeleteBuffers(1, &ebo);
-        }
-        if (vbo != 0U) {
-            glDeleteBuffers(1, &vbo);
-        }
-        if (vao != 0U) {
-            glDeleteVertexArrays(1, &vao);
-        }
-    }
-};
-
 struct ChromaState {
     OverlayMode mode = OverlayMode::Hidden;
     bool toggleWasPressed = false;
 
     asset::ShaderProgram program{};
     asset::Texture texture{};
-    std::shared_ptr<GpuResources> gpu{};
+    std::shared_ptr<graphics::ScreenQuad> quad{};
 
     GLint locAlbedo = -1;
     GLint locEnableKey = -1;
@@ -104,42 +80,6 @@ inline const char* modeName(OverlayMode mode) {
     return "unknown";
 }
 
-// Fullscreen quad in NDC: 4 verts (x, y, u, v). Origin at center, covers [-1, 1].
-inline void buildScreenQuad(GpuResources& gpu) {
-    // UV v is flipped (1 - v) because stb_image is loaded with vertical flip enabled,
-    // and we want the image to appear right-side-up on screen.
-    constexpr std::array<float, 16> kVertices = {
-        -1.0f, -1.0f, 0.0f, 0.0f,
-         1.0f, -1.0f, 1.0f, 0.0f,
-         1.0f,  1.0f, 1.0f, 1.0f,
-        -1.0f,  1.0f, 0.0f, 1.0f,
-    };
-    constexpr std::array<std::uint32_t, 6> kIndices = {0, 1, 2, 0, 2, 3};
-
-    glGenVertexArrays(1, &gpu.vao);
-    glGenBuffers(1, &gpu.vbo);
-    glGenBuffers(1, &gpu.ebo);
-
-    glBindVertexArray(gpu.vao);
-
-    glBindBuffer(GL_ARRAY_BUFFER, gpu.vbo);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(kVertices), kVertices.data(), GL_STATIC_DRAW);
-
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, gpu.ebo);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(kIndices), kIndices.data(), GL_STATIC_DRAW);
-
-    constexpr GLsizei kStride = 4 * sizeof(float);
-    glEnableVertexAttribArray(0);
-    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, kStride, reinterpret_cast<void*>(0));
-    glEnableVertexAttribArray(1);
-    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, kStride,
-                          reinterpret_cast<void*>(2 * sizeof(float)));
-
-    glBindVertexArray(0);
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-}
-
 inline void setupSystem(Registry& registry) {
     if (registry.getObject<ChromaState>(kChromaStateName) != nullptr) {
         return;
@@ -166,8 +106,8 @@ inline void setupSystem(Registry& registry) {
     state.locKeyThreshold = glGetUniformLocation(state.program.id, "u_keyThreshold");
     state.locKeySoftness = glGetUniformLocation(state.program.id, "u_keySoftness");
 
-    state.gpu = std::make_shared<GpuResources>();
-    buildScreenQuad(*state.gpu);
+    state.quad = std::make_shared<graphics::ScreenQuad>();
+    graphics::buildScreenQuad(*state.quad);
 
     registry.registerObject(kChromaStateName, std::move(state));
     LOG_INFO("Chroma overlay ready (press L to cycle: hidden -> overlay -> chroma-keyed)");
@@ -194,7 +134,7 @@ inline void renderSystem(Registry& registry) {
     if (state == nullptr || state->mode == OverlayMode::Hidden) {
         return;
     }
-    if (state->program.id == 0U || state->gpu == nullptr || state->gpu->vao == 0U ||
+    if (state->program.id == 0U || state->quad == nullptr || state->quad->vao == 0U ||
         state->texture.textureHdl == 0U) {
         return;
     }
@@ -231,9 +171,7 @@ inline void renderSystem(Registry& registry) {
         glUniform1f(state->locKeySoftness, state->keySoftness);
     }
 
-    glBindVertexArray(state->gpu->vao);
-    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);
-    glBindVertexArray(0);
+    graphics::drawScreenQuad(*state->quad);
 
     glBindTexture(GL_TEXTURE_2D, 0);
     glUseProgram(0);

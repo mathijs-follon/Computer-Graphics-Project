@@ -102,6 +102,7 @@ add_executable(CG_OpenGL_Project
         src/graphics/camera.hpp
         src/graphics/geometry.hpp
         src/graphics/rendering.hpp
+        src/graphics/screen_quad.hpp
         src/app/players.hpp
         src/asset/asset.hpp
         src/asset/asset_paths.hpp
@@ -113,6 +114,10 @@ add_executable(CG_OpenGL_Project
         src/app/objects/island.hpp
         src/app/objects/glijbaan.hpp
         src/app/chroma.hpp
+        src/app/bloom.hpp
+        src/app/crosshair.hpp
+        src/app/interactive_lights.hpp
+        src/app/objects/lights.hpp
 )
 
 # Remove DEBUG to disable logs to LOG_CONSOLE
