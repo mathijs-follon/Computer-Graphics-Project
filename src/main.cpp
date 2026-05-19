@@ -1,4 +1,5 @@
 #include "app/app.hpp"
+#include "app/chroma.hpp"
 #include "app/objects/island.hpp"
 #include "app/objects/glijbaan.hpp"
 #include "graphics/rendering.hpp"
@@ -16,6 +17,7 @@ void setupInitSystems(App& app) {
     app.addInitSystem(InitStage::Setup, rendering::setupSystem);
     app.addInitSystem(InitStage::Setup, island::setupSystem);
     app.addInitSystem(InitStage::Setup, glijbaan::setupSystem);
+    app.addInitSystem(InitStage::Setup, chroma::setupSystem);
 }
 
 void setupLoopSystems(App& app) {
@@ -28,6 +30,7 @@ void setupLoopSystems(App& app) {
     app.addLoopSystem(LoopStage::Update, camera::inputSystem);
     app.addLoopSystem(LoopStage::Update, glijbaan::inputSystem);
     app.addLoopSystem(LoopStage::Update, glijbaan::rideSystem);
+    app.addLoopSystem(LoopStage::Update, chroma::inputSystem);
     app.addLoopSystem(LoopStage::Update, camera::syncCamerasFromEntitiesSystem);
     app.addLoopSystem(LoopStage::Update, camera::updateMatricesSystem);
 
@@ -38,6 +41,7 @@ void setupLoopSystems(App& app) {
     app.addLoopSystem(LoopStage::Render, rendering::drawOpaqueMeshesSystem);
     app.addLoopSystem(LoopStage::Render, rendering::drawTransparentMeshesSystem);
     app.addLoopSystem(LoopStage::Render, rendering::drawWireFrameMeshesSystem);
+    app.addLoopSystem(LoopStage::Render, chroma::renderSystem);
     app.addLoopSystem(LoopStage::Render, rendering::endRenderStateSystem);
 
     // End

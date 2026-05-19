@@ -112,6 +112,7 @@ add_executable(CG_OpenGL_Project
         src/asset/render_object_spawner.hpp
         src/app/objects/island.hpp
         src/app/objects/glijbaan.hpp
+        src/app/chroma.hpp
 )
 
 # Remove DEBUG to disable logs to LOG_CONSOLE

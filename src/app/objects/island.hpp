@@ -56,7 +56,6 @@ inline void applyWaterShaderToIslandMeshes(Registry& registry, const std::string
         mesh->locColor = waterProgram.resource->locColor;
         mesh->locAlbedo = waterProgram.resource->locAlbedo;
         mesh->layer = rendering::RenderLayer::Transparent;
-        mesh->transparentDepthBias = true;
         mesh->useFrustumCull = false;
     }
 }

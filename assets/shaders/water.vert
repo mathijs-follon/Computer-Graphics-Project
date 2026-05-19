@@ -15,6 +15,4 @@ void main() {
     v_worldNormal = normalize(normalMatrix * a_normal);
     v_uv = a_uv;
     gl_Position = u_mvp * vec4(a_pos, 1.0);
-    // Pull water slightly toward the camera so it wins depth tests against coplanar shoreline geometry.
-    gl_Position.z -= 0.0005 * gl_Position.w;
 }
