@@ -2,6 +2,8 @@
 #include "app/chroma.hpp"
 #include "app/objects/island.hpp"
 #include "app/objects/glijbaan.hpp"
+#include "app/objects/curves.hpp"
+#include "app/objects/lights.hpp"
 #include "graphics/rendering.hpp"
 #include "graphics/camera.hpp"
 #include "graphics/window.hpp"
@@ -18,6 +20,8 @@ void setupInitSystems(App& app) {
     app.addInitSystem(InitStage::Setup, island::setupSystem);
     app.addInitSystem(InitStage::Setup, glijbaan::setupSystem);
     app.addInitSystem(InitStage::Setup, chroma::setupSystem);
+    app.addInitSystem(InitStage::Setup, curves::setupSystem);
+    app.addInitSystem(InitStage::Setup, lights::setupSystem);
 }
 
 void setupLoopSystems(App& app) {
@@ -49,7 +53,8 @@ void setupLoopSystems(App& app) {
 
     // Debug
     // app.addLoopSystem(LoopStage::Debug, camera::debugPrintCameraSystem);
-    // app.addLoopSystem(LoopStage::EndFrame, camera::coordDebugSystem);  // glijbaan control-point capture
+    // app.addLoopSystem(LoopStage::EndFrame, camera::coordDebugSystem);  // glijbaan control-point
+    // capture
 }
 
 void setupShutdownSystems(App& app) {

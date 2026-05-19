@@ -1,4 +1,5 @@
 #include "asset/shader.hpp"
+#include "log/log.hpp"
 
 #include <fstream>
 #include <sstream>
@@ -41,6 +42,13 @@ std::optional<Shader> loadShaderFromPath(ShaderType type, std::string_view path)
     GLint status = GL_FALSE;
     glGetShaderiv(shaderId, GL_COMPILE_STATUS, &status);
     if (status != GL_TRUE) {
+        GLint logLength = 0;
+        glGetShaderiv(shaderId, GL_INFO_LOG_LENGTH, &logLength);
+        std::string log(logLength, '\0');
+
+        glGetShaderInfoLog(shaderId, logLength, nullptr, log.data());
+        LOG_ERROR(log);
+
         glDeleteShader(shaderId);
         return std::nullopt;
     }
@@ -56,12 +64,14 @@ std::optional<ShaderProgram> loadShaderProgramFromPaths(std::string_view vertexS
                                                         std::string_view fragmentShaderPath) {
     const auto vertexShader = loadShaderFromPath(ShaderType::Vertex, vertexShaderPath);
     if (!vertexShader.has_value()) {
+        LOG_CRITICAL("NO VERTEX");
         return std::nullopt;
     }
 
     const auto fragmentShader = loadShaderFromPath(ShaderType::Fragment, fragmentShaderPath);
     if (!fragmentShader.has_value()) {
         glDeleteShader(vertexShader->id);
+        LOG_CRITICAL("NO FRAG");
         return std::nullopt;
     }
 
@@ -102,6 +112,35 @@ std::optional<ShaderProgram> loadShaderProgramFromPaths(std::string_view vertexS
     program.resource->locColor = glGetUniformLocation(programId, "u_color");
     program.resource->locAlbedo = glGetUniformLocation(
         programId, "u_albedo");  // the base color / the reflectivity of a surface
+
+    program.resource->locViewPos = glGetUniformLocation(programId, "u_viewPos");
+
+    program.resource->locMaterialAmbient = glGetUniformLocation(programId, "u_material.ambient");
+    program.resource->locMaterialDiffuse = glGetUniformLocation(programId, "u_material.diffuse");
+    program.resource->locMaterialShininess =
+        glGetUniformLocation(programId, "u_material.shininess");
+    program.resource->locMaterialSpecular = glGetUniformLocation(programId, "u_material.specular");
+
+    // cache all the light data locaties
+    for (int i = 0; i < ShaderProgram::MAX_LIGHT_COUNT; i++) {
+        program.resource->LightResources[i].locActive =
+            glGetUniformLocation(programId, std::format("u_lights[{}].on", i).c_str());
+        program.resource->LightResources[i].locPos =
+            glGetUniformLocation(programId, std::format("u_lights[{}].pos", i).c_str());
+        program.resource->LightResources[i].locColor =
+            glGetUniformLocation(programId, std::format("u_lights[{}].color", i).c_str());
+        program.resource->LightResources[i].locLinAtt =
+            glGetUniformLocation(programId, std::format("u_lights[{}].linAtt", i).c_str());
+        program.resource->LightResources[i].locQuadAtt =
+            glGetUniformLocation(programId, std::format("u_lights[{}].quadAtt", i).c_str());
+        program.resource->LightResources[i].locAmbient =
+            glGetUniformLocation(programId, std::format("u_lights[{}].ambientFac", i).c_str());
+        program.resource->LightResources[i].locDiffuse =
+            glGetUniformLocation(programId, std::format("u_lights[{}].diffuseFac", i).c_str());
+        program.resource->LightResources[i].locSpecular =
+            glGetUniformLocation(programId, std::format("u_lights[{}].specularFac", i).c_str());
+    }
+
     return program;
 }
 

@@ -206,6 +206,7 @@ buildGpuMeshInstances(const SpawnAssets& assets, const RenderObjectSpawnRequest&
         instance.shaderProgram = assets.program.id;
         instance.shaderLifetime = assets.program.resource;
         instance.locMvp = assets.program.resource ? assets.program.resource->locMvp : -1;
+        instance.locViewPos = assets.program.resource ? assets.program.resource->locMvp : -1;
         instance.locModel = assets.program.resource ? assets.program.resource->locModel : -1;
         instance.locView = assets.program.resource ? assets.program.resource->locView : -1;
         instance.locProjection =
@@ -217,6 +218,18 @@ buildGpuMeshInstances(const SpawnAssets& assets, const RenderObjectSpawnRequest&
         instance.layer = request.layer;
         instance.modelBounds = AABB{meshMin, meshMax};
         instance.useFrustumCull = request.enableFrustumCull;
+
+        instance.material = assets.model.materials[0];
+
+        instance.locMaterialAmbient =
+            assets.program.resource ? assets.program.resource->locMaterialAmbient : -1;
+        instance.locMaterialDiffuse =
+            assets.program.resource ? assets.program.resource->locMaterialDiffuse : -1;
+        instance.locMaterialShininess =
+            assets.program.resource ? assets.program.resource->locMaterialShininess : -1;
+        instance.locMaterialSpecular =
+            assets.program.resource ? assets.program.resource->locMaterialSpecular : -1;
+
         out.push_back(std::move(instance));
     }
     return out;
@@ -424,6 +437,9 @@ RenderObjectSpawnResult spawnModelAsRenderMeshes(Registry& registry,
     } else {
         built = buildGpuMeshInstances(*assetsOpt, request, result.textureSelection);
     }
+
+    registry.registerObject(request.namePrefix + ".mesh.shaderProgram",
+                            std::move(assetsOpt->program));
 
     result.meshCount = registerSpawnedMeshes(registry, request.namePrefix, std::move(built));
     if (result.meshCount == 0U) {

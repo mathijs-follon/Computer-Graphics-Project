@@ -9,11 +9,13 @@ uniform mat4 u_model;
 
 out vec3 v_worldNormal;
 out vec2 v_uv;
+out vec3 v_frag_pos;
 
 void main() {
     mat3 normalMatrix = mat3(transpose(inverse(u_model)));
     v_worldNormal = normalize(normalMatrix * a_normal);
     v_uv = a_uv;
+    v_frag_pos = vec3(u_model * vec4(a_pos, 1.0));
     gl_Position = u_mvp * vec4(a_pos, 1.0);
 }
 

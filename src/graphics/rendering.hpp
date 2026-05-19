@@ -1,6 +1,7 @@
 #ifndef CG_OPENGL_PROJECT_RENDERING_HPP
 #define CG_OPENGL_PROJECT_RENDERING_HPP
 
+#include "asset/material.hpp"
 #include "graphics/camera.hpp"
 #include "graphics/geometry.hpp"
 #include "log/log.hpp"
@@ -71,9 +72,17 @@ struct RenderMeshInstance {
     GLint locMvp = -1;
     GLint locModel = -1;
     GLint locView = -1;
+    GLint locViewPos = -1;
     GLint locProjection = -1;
     GLint locColor = -1;
     GLint locAlbedo = -1;
+
+    GLint locMaterialAmbient = -1;
+    GLint locMaterialDiffuse = -1;
+    GLint locMaterialShininess = -1;
+    GLint locMaterialSpecular = -1;
+
+    asset::Material material;
 
     glm::mat4 modelMatrix{1.0f};
     RenderLayer layer = RenderLayer::Opaque;
@@ -253,6 +262,22 @@ inline void drawMeshList(const std::vector<RenderFrameScratch::DrawRef>& list,
         }
         if (mesh->locProjection >= 0) {
             glUniformMatrix4fv(mesh->locProjection, 1, GL_FALSE, glm::value_ptr(cam.projMatrix));
+        }
+        if (mesh->locViewPos >= 0) {
+            glUniform3fv(mesh->locViewPos, 1, glm::value_ptr(cam.position));
+        }
+
+        if (mesh->locMaterialAmbient >= 0) {
+            glUniform3fv(mesh->locMaterialAmbient, 1, mesh->material.baseColorFactor.data());
+        }
+        if (mesh->locMaterialDiffuse >= 0) {
+            glUniform3fv(mesh->locMaterialAmbient, 1, mesh->material.emissiveFactor.data());
+        }
+        if (mesh->locMaterialShininess >= 0) {
+            glUniform1f(mesh->locMaterialAmbient, mesh->material.shininess);
+        }
+        if (mesh->locMaterialSpecular >= 0) {
+            glUniform3fv(mesh->locMaterialAmbient, 1, mesh->material.emissiveFactor.data());
         }
 
         if (mesh->buffers->vao != currentVao) {

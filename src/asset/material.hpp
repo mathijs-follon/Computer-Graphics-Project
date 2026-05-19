@@ -29,11 +29,11 @@ struct Material {
     // Basiswaarden zodat een model ook zonder textures zichtbaar blijft.
     std::string name;
     std::array<float, 4> baseColorFactor{1.0F, 1.0F, 1.0F, 1.0F};
-    std::array<float, 3> emissiveFactor{0.0F, 0.0F, 0.0F};
+    std::array<float, 3> emissiveFactor{1.0F, 1.0F, 1.0F};
     float metallicFactor = 1.0F;
     float roughnessFactor = 1.0F;
     float opacity = 1.0F;
-    float shininess = 0.0F;
+    float shininess = 16.0F;
 
     std::vector<MaterialTextureBinding> textures;
 };
