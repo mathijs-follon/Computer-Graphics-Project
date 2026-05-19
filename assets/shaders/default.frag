@@ -39,7 +39,8 @@ vec3 addPointLighting(PointLight light, vec3 normal, vec3 viewDir)
     float diffuseStrength = max(dot(normal, lightDir), 0.0);
    
     vec3 reflectDir = reflect(-lightDir, normal);  
-    float specularStrength = pow(max(dot(viewDir, reflectDir), 0.0), u_material.shininess);
+    float shininess = max(u_material.shininess, 1.0);
+    float specularStrength = pow(max(dot(viewDir, reflectDir), 0.0), shininess);
 
     float distance = length(light.pos - v_frag_pos);
     float attenuation = 1.0 / (1.0 + light.linAtt * distance + light.quadAtt * distance * distance);    

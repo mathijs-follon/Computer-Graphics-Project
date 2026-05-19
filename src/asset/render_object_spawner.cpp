@@ -206,7 +206,7 @@ buildGpuMeshInstances(const SpawnAssets& assets, const RenderObjectSpawnRequest&
         instance.shaderProgram = assets.program.id;
         instance.shaderLifetime = assets.program.resource;
         instance.locMvp = assets.program.resource ? assets.program.resource->locMvp : -1;
-        instance.locViewPos = assets.program.resource ? assets.program.resource->locMvp : -1;
+        instance.locViewPos = assets.program.resource ? assets.program.resource->locViewPos : -1;
         instance.locModel = assets.program.resource ? assets.program.resource->locModel : -1;
         instance.locView = assets.program.resource ? assets.program.resource->locView : -1;
         instance.locProjection =
