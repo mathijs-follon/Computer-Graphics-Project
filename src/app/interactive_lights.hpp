@@ -1,7 +1,6 @@
 #ifndef CG_OPENGL_PROJECT_INTERACTIVE_LIGHTS_HPP
 #define CG_OPENGL_PROJECT_INTERACTIVE_LIGHTS_HPP
 
-
 #include "app/app.hpp"
 #include "asset/asset.hpp"
 #include "graphics/camera.hpp"
@@ -43,13 +42,13 @@ inline constexpr float kEmissiveBoost = 3.0f;
 inline constexpr float kSphereAlpha = 0.55f;
 
 inline constexpr std::array<glm::vec3, 7> kPalette = {
-    glm::vec3{1.0f, 1.0f, 1.0f},   // white
-    glm::vec3{1.0f, 0.15f, 0.15f}, // red
-    glm::vec3{1.0f, 0.55f, 0.10f}, // orange
-    glm::vec3{1.0f, 1.0f, 0.20f},  // yellow
-    glm::vec3{0.20f, 1.0f, 0.30f}, // green
-    glm::vec3{0.20f, 0.7f, 1.0f},  // cyan/blue
-    glm::vec3{1.0f, 0.25f, 1.0f},  // magenta
+    glm::vec3{1.0f, 1.0f, 1.0f},    // white
+    glm::vec3{1.0f, 0.15f, 0.15f},  // red
+    glm::vec3{1.0f, 0.55f, 0.10f},  // orange
+    glm::vec3{1.0f, 1.0f, 0.20f},   // yellow
+    glm::vec3{0.20f, 1.0f, 0.30f},  // green
+    glm::vec3{0.20f, 0.7f, 1.0f},   // cyan/blue
+    glm::vec3{1.0f, 0.25f, 1.0f},   // magenta
 };
 
 inline constexpr int kFirstLightSlot = 1;
@@ -133,8 +132,7 @@ inline void generateUnitSphere(std::vector<rendering::GpuVertex>& outVertices,
 
     for (int i = 0; i < kSphereRings; ++i) {
         for (int j = 0; j < kSphereSegments; ++j) {
-            const std::uint32_t a =
-                static_cast<std::uint32_t>(i * (kSphereSegments + 1) + j);
+            const std::uint32_t a = static_cast<std::uint32_t>(i * (kSphereSegments + 1) + j);
             const std::uint32_t b = a + static_cast<std::uint32_t>(kSphereSegments + 1);
             outIndices.push_back(a);
             outIndices.push_back(b);
@@ -188,11 +186,9 @@ inline void uploadSphereMesh(SphereMeshGpu& gpu) {
 
 inline std::array<glm::vec3, kSphereCount> spherePositions() {
     return {
-        glm::vec3{50.0f, -150.0f, 100.0f},      // near the slide entry, elevated
-        glm::vec3{-200.0f, -260.0f, 250.0f},
-        glm::vec3{-300.0f, -250.0f, -150.0f}, 
-        glm::vec3{100.0f, -350.0f, -450.0f}, 
-        glm::vec3{400.0f, -380.0f, -300.0f},
+        glm::vec3{50.0f, -150.0f, 100.0f},  // near the slide entry, elevated
+        glm::vec3{-200.0f, -260.0f, 250.0f}, glm::vec3{-300.0f, -250.0f, -150.0f},
+        glm::vec3{100.0f, -350.0f, -450.0f}, glm::vec3{400.0f, -380.0f, -300.0f},
     };
 }
 
@@ -269,13 +265,12 @@ inline void setupSystem(Registry& registry) {
     }
 
     registry.registerObject(kStateName, std::move(state));
-    LOG_INFO(
-        "Interactive light spheres ready ({} spheres, left-click to cycle color)", kSphereCount);
+    LOG_INFO("Interactive light spheres ready ({} spheres, left-click to cycle color)",
+             kSphereCount);
 }
 
 inline std::optional<float> intersectRaySphere(const glm::vec3& origin, const glm::vec3& dir,
-                                               const glm::vec3& sphereCenter,
-                                               float sphereRadius) {
+                                               const glm::vec3& sphereCenter, float sphereRadius) {
     const glm::vec3 L = origin - sphereCenter;
     const float b = 2.0f * glm::dot(L, dir);
     const float c = glm::dot(L, L) - sphereRadius * sphereRadius;

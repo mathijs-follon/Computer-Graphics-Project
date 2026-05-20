@@ -117,7 +117,8 @@ inline GLuint createColorTexture(int width, int height) {
 inline bool buildFboSet(FboSet& fbos, int fbWidth, int fbHeight) {
     fbos.sceneWidth = fbWidth;
     fbos.sceneHeight = fbHeight;
-    fbos.bloomWidth = std::max(1, static_cast<int>(static_cast<float>(fbWidth) * kBloomBufferScale));
+    fbos.bloomWidth =
+        std::max(1, static_cast<int>(static_cast<float>(fbWidth) * kBloomBufferScale));
     fbos.bloomHeight =
         std::max(1, static_cast<int>(static_cast<float>(fbHeight) * kBloomBufferScale));
 
@@ -130,7 +131,8 @@ inline bool buildFboSet(FboSet& fbos, int fbWidth, int fbHeight) {
     glGenFramebuffers(1, &fbos.sceneFbo);
     glBindFramebuffer(GL_FRAMEBUFFER, fbos.sceneFbo);
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, fbos.sceneColor, 0);
-    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, fbos.sceneDepth);
+    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER,
+                              fbos.sceneDepth);
     if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
         LOG_ERROR("Bloom scene FBO incomplete");
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
@@ -193,8 +195,8 @@ inline void setupSystem(Registry& registry) {
                                                                 std::string(kBrightFragPath));
     state.blurProgram = asset::AssetLoader::loadShaderProgram(std::string(kVertexShaderPath),
                                                               std::string(kBlurFragPath));
-    state.compositeProgram = asset::AssetLoader::loadShaderProgram(
-        std::string(kVertexShaderPath), std::string(kCompositeFragPath));
+    state.compositeProgram = asset::AssetLoader::loadShaderProgram(std::string(kVertexShaderPath),
+                                                                   std::string(kCompositeFragPath));
     if (state.brightProgram.id == 0U || state.blurProgram.id == 0U ||
         state.compositeProgram.id == 0U) {
         LOG_WARN("Bloom shader programs failed to load; bloom disabled");

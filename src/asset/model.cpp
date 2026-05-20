@@ -20,7 +20,8 @@ namespace {
     return glm::transpose(glm::make_mat4(&from.a1));
 }
 
-void collectMeshWorldFromRoot(const aiNode* node, const glm::mat4& parentWorld, std::vector<glm::mat4>& meshWorld) {
+void collectMeshWorldFromRoot(const aiNode* node, const glm::mat4& parentWorld,
+                              std::vector<glm::mat4>& meshWorld) {
     const glm::mat4 local = assimpMatrixToGlm(node->mTransformation);
     const glm::mat4 world = parentWorld * local;
     for (unsigned int i = 0; i < node->mNumMeshes; ++i) {
@@ -74,7 +75,8 @@ std::optional<Model> loadModelFromPath(std::string_view path) {
                                          aiProcess_ImproveCacheLocality | aiProcess_GenNormals |
                                          aiProcess_CalcTangentSpace | aiProcess_SortByPType;
     const aiScene* scene = importer.ReadFile(sourcePath.string(), importFlags);
-    if (scene == nullptr || (scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE) != 0U || scene->mRootNode == nullptr) {
+    if (scene == nullptr || (scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE) != 0U ||
+        scene->mRootNode == nullptr) {
         return std::nullopt;
     }
 
@@ -94,15 +96,18 @@ std::optional<Model> loadModelFromPath(std::string_view path) {
     for (unsigned int materialIndex = 0; materialIndex < scene->mNumMaterials; ++materialIndex) {
         const aiMaterial* aiMaterialData = scene->mMaterials[materialIndex];
         Material material{};
-        if (aiString materialName; aiMaterialData->Get(AI_MATKEY_NAME, materialName) == aiReturn_SUCCESS) {
+        if (aiString materialName;
+            aiMaterialData->Get(AI_MATKEY_NAME, materialName) == aiReturn_SUCCESS) {
             material.name = materialName.C_Str();
         }
         aiColor4D diffuse{};
-        if (aiGetMaterialColor(aiMaterialData, AI_MATKEY_COLOR_DIFFUSE, &diffuse) == aiReturn_SUCCESS) {
+        if (aiGetMaterialColor(aiMaterialData, AI_MATKEY_COLOR_DIFFUSE, &diffuse) ==
+            aiReturn_SUCCESS) {
             material.baseColorFactor = {diffuse.r, diffuse.g, diffuse.b, diffuse.a};
         }
         aiColor4D emissive{};
-        if (aiGetMaterialColor(aiMaterialData, AI_MATKEY_COLOR_EMISSIVE, &emissive) == aiReturn_SUCCESS) {
+        if (aiGetMaterialColor(aiMaterialData, AI_MATKEY_COLOR_EMISSIVE, &emissive) ==
+            aiReturn_SUCCESS) {
             material.emissiveFactor = {emissive.r, emissive.g, emissive.b};
         }
         ai_real opacity = 1.0;
@@ -110,20 +115,24 @@ std::optional<Model> loadModelFromPath(std::string_view path) {
             material.opacity = static_cast<float>(opacity);
         }
         ai_real shininess = 0.0;
-        if (aiGetMaterialFloat(aiMaterialData, AI_MATKEY_SHININESS, &shininess) == aiReturn_SUCCESS) {
+        if (aiGetMaterialFloat(aiMaterialData, AI_MATKEY_SHININESS, &shininess) ==
+            aiReturn_SUCCESS) {
             material.shininess = static_cast<float>(shininess);
         }
 
         const auto addTexturesByType = [&](aiTextureType textureType, MaterialTextureSlot slot) {
-            // Laad per slot alleen geldige textures; ontbrekende bestanden mogen overgeslagen worden.
-            for (unsigned int textureIndex = 0; textureIndex < aiMaterialData->GetTextureCount(textureType);
-                 ++textureIndex) {
+            // Laad per slot alleen geldige textures; ontbrekende bestanden mogen overgeslagen
+            // worden.
+            for (unsigned int textureIndex = 0;
+                 textureIndex < aiMaterialData->GetTextureCount(textureType); ++textureIndex) {
                 aiString texturePath;
-                if (aiMaterialData->GetTexture(textureType, textureIndex, &texturePath) != aiReturn_SUCCESS) {
+                if (aiMaterialData->GetTexture(textureType, textureIndex, &texturePath) !=
+                    aiReturn_SUCCESS) {
                     continue;
                 }
                 const fs::path resolvedPath = resolveTexturePath(texturePath);
-                const std::optional<Texture> loadedTexture = loadTextureFromPath(resolvedPath.string());
+                const std::optional<Texture> loadedTexture =
+                    loadTextureFromPath(resolvedPath.string());
                 if (!loadedTexture.has_value()) {
                     continue;
                 }

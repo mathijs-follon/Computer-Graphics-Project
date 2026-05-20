@@ -198,19 +198,20 @@ inline std::optional<PathSample> sampleAtDistance(const GlijbaanPath& path, doub
 
     distance = wrapArcLength(distance, path.totalLength);
 
-    const auto segmentIt =
-        std::upper_bound(path.segmentStartDistance.begin(), path.segmentStartDistance.end(), distance);
+    const auto segmentIt = std::upper_bound(path.segmentStartDistance.begin(),
+                                            path.segmentStartDistance.end(), distance);
     std::size_t segmentIndex = 0;
     if (segmentIt != path.segmentStartDistance.begin()) {
-        segmentIndex =
-            static_cast<std::size_t>(std::distance(path.segmentStartDistance.begin(), segmentIt) - 1);
+        segmentIndex = static_cast<std::size_t>(
+            std::distance(path.segmentStartDistance.begin(), segmentIt) - 1);
     }
     if (segmentIndex >= path.segments.size()) {
         segmentIndex = path.segments.size() - 1;
     }
 
     const double localDistance = distance - path.segmentStartDistance[segmentIndex];
-    const std::optional<double> localT = path.segments[segmentIndex].tvalueForDistance(localDistance);
+    const std::optional<double> localT =
+        path.segments[segmentIndex].tvalueForDistance(localDistance);
     if (!localT.has_value()) {
         return std::nullopt;
     }
@@ -263,7 +264,8 @@ inline float maxExtent(const std::vector<rendering::GpuVertex>& vertices) {
     return std::max({extent.x, extent.y, extent.z, 1.0e-4f});
 }
 
-// Track frame: tangent along the curve, slideUp +-= world +Y, slideRight horizontal in the cross-section.
+// Track frame: tangent along the curve, slideUp +-= world +Y, slideRight horizontal in the
+// cross-section.
 inline void computeFrameAt(const glm::vec3& tangent, glm::vec3& normalOut, glm::vec3& binormalOut) {
     constexpr glm::vec3 worldUp{0.0f, 1.0f, 0.0f};
     glm::vec3 tangentSafe = tangent;
@@ -303,7 +305,8 @@ inline void pushGpuVertex(std::vector<rendering::GpuVertex>& verticesOut, const 
     });
 }
 
-// Solid half-pipe shell: inner riding surface, outer wall, side bands; trough opens toward +slideUp.
+// Solid half-pipe shell: inner riding surface, outer wall, side bands; trough opens toward
+// +slideUp.
 inline void buildHalfPipeMesh(const std::vector<glm::vec3>& centerLine, float radius,
                               float wallThickness, std::size_t ringSegments,
                               std::vector<rendering::GpuVertex>& verticesOut,
@@ -336,9 +339,10 @@ inline void buildHalfPipeMesh(const std::vector<glm::vec3>& centerLine, float ra
         }
     }
 
-    const auto vertexIndex = [vertsPerStation, ringVertexCount](std::size_t station, std::size_t layer,
-                                                               std::size_t ring) {
-        return static_cast<std::uint32_t>(station * vertsPerStation + layer * ringVertexCount + ring);
+    const auto vertexIndex = [vertsPerStation, ringVertexCount](
+                                 std::size_t station, std::size_t layer, std::size_t ring) {
+        return static_cast<std::uint32_t>(station * vertsPerStation + layer * ringVertexCount +
+                                          ring);
     };
 
     const auto pushTriangle = [&](std::uint32_t a, std::uint32_t b, std::uint32_t c) {
@@ -354,9 +358,8 @@ inline void buildHalfPipeMesh(const std::vector<glm::vec3>& centerLine, float ra
 
     std::vector<float> stationArcLength(stationCount, 0.0f);
     for (std::size_t station = 1; station < stationCount; ++station) {
-        stationArcLength[station] =
-            stationArcLength[station - 1] +
-            glm::length(centerLine[station] - centerLine[station - 1]);
+        stationArcLength[station] = stationArcLength[station - 1] +
+                                    glm::length(centerLine[station] - centerLine[station - 1]);
     }
 
     const float crossSectionArc = glm::pi<float>() * radius;
@@ -375,9 +378,9 @@ inline void buildHalfPipeMesh(const std::vector<glm::vec3>& centerLine, float ra
         std::vector<glm::vec3> wallOutwards(ringSegments);
 
         for (std::size_t ring = 0; ring < ringSegments; ++ring) {
-            const float theta =
-                -glm::pi<float>() * 0.5f +
-                glm::pi<float>() * static_cast<float>(ring) / static_cast<float>(ringSegments - 1);
+            const float theta = -glm::pi<float>() * 0.5f + glm::pi<float>() *
+                                                               static_cast<float>(ring) /
+                                                               static_cast<float>(ringSegments - 1);
             const glm::vec3 offset =
                 radius * (std::sin(theta) * slideRight - std::cos(theta) * slideUp);
 
@@ -394,14 +397,12 @@ inline void buildHalfPipeMesh(const std::vector<glm::vec3>& centerLine, float ra
         }
 
         for (std::size_t ring = 0; ring < ringSegments; ++ring) {
-            const float v01 =
-                (static_cast<float>(ring) + 0.5f) / static_cast<float>(ringSegments);
+            const float v01 = (static_cast<float>(ring) + 0.5f) / static_cast<float>(ringSegments);
             const float vCoord = v01 * crossSectionArc / tileUnits;
             pushGpuVertex(verticesOut, innerPositions[ring], -wallOutwards[ring], uCoord, vCoord);
         }
         for (std::size_t ring = 0; ring < ringSegments; ++ring) {
-            const float v01 =
-                (static_cast<float>(ring) + 0.5f) / static_cast<float>(ringSegments);
+            const float v01 = (static_cast<float>(ring) + 0.5f) / static_cast<float>(ringSegments);
             const float vCoord = v01 * crossSectionArc / tileUnits;
             pushGpuVertex(verticesOut, outerPositions[ring], wallOutwards[ring], uCoord, vCoord);
         }
@@ -463,12 +464,10 @@ inline glm::mat4 orientationFromTrackFrame(const glm::vec3& tangent, const glm::
 
 inline glm::mat4 buildRiderWorldMatrix(const SlideRiderEntity& rider) {
     const glm::mat4 orientation = orientationFromTrackFrame(rider.forward, rider.trackNormal);
-    const glm::mat4 yawCorrection = glm::rotate(glm::mat4{1.0f},
-                                                  glm::radians(rider.modelYawCorrectionDeg),
-                                                  glm::vec3{0.0f, 1.0f, 0.0f});
-    const glm::mat4 pitchCorrection = glm::rotate(glm::mat4{1.0f},
-                                                  glm::radians(rider.modelPitchCorrectionDeg),
-                                                  glm::vec3{1.0f, 0.0f, 0.0f});
+    const glm::mat4 yawCorrection = glm::rotate(
+        glm::mat4{1.0f}, glm::radians(rider.modelYawCorrectionDeg), glm::vec3{0.0f, 1.0f, 0.0f});
+    const glm::mat4 pitchCorrection = glm::rotate(
+        glm::mat4{1.0f}, glm::radians(rider.modelPitchCorrectionDeg), glm::vec3{1.0f, 0.0f, 0.0f});
     const glm::mat4 translation = glm::translate(glm::mat4{1.0f}, rider.position);
     return translation * orientation * pitchCorrection * yawCorrection;
 }
@@ -492,8 +491,10 @@ inline void syncRiderMeshes(Registry& registry, const GlijbaanState& state,
             mesh->modelMatrix = worldMatrix * binding.baseModelMatrix;
             mesh->visible = true;
             mesh->useFrustumCull = false;
-            const glm::vec3 worldMin = glm::vec3(worldMatrix * glm::vec4(mesh->modelBounds.min, 1.0f));
-            const glm::vec3 worldMax = glm::vec3(worldMatrix * glm::vec4(mesh->modelBounds.max, 1.0f));
+            const glm::vec3 worldMin =
+                glm::vec3(worldMatrix * glm::vec4(mesh->modelBounds.min, 1.0f));
+            const glm::vec3 worldMax =
+                glm::vec3(worldMatrix * glm::vec4(mesh->modelBounds.max, 1.0f));
             mesh->modelBounds = AABB{glm::min(worldMin, worldMax), glm::max(worldMin, worldMax)};
         }
     }
@@ -566,8 +567,7 @@ inline void setMeshPrefixVisible(Registry& registry, std::string_view prefix, bo
 inline void setupSystem(Registry& registry) {
     GlijbaanState state{};
     state.path = buildGlijbaanPath();
-    state.glijbaanCubicBezierSamples =
-        buildCenterLineSamples(kHalfPipeCenterlineSamplesPerSegment);
+    state.glijbaanCubicBezierSamples = buildCenterLineSamples(kHalfPipeCenterlineSamplesPerSegment);
     buildHalfPipeMesh(state.glijbaanCubicBezierSamples, kHalfPipeRadius, kHalfPipeWallThickness,
                       kHalfPipeRingSegments, state.halfPipeVertices, state.halfPipeIndices);
 

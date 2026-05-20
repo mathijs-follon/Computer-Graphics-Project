@@ -32,7 +32,6 @@ struct Camera {
     float nearZ{0.1f};
     float farZ{4000.0f};
 
-
     glm::mat4 viewMatrix{1.0f};
     glm::mat4 projMatrix{1.0f};
     glm::mat4 viewProjMatrix{1.0f};
@@ -43,7 +42,6 @@ enum class CameraId : std::size_t {
     FreeRoam = 0,
     SlideFollow = 1,
 };
-
 
 struct CameraState {
     std::array<Camera, 2> cameras{};
@@ -84,7 +82,6 @@ inline const Camera* activeCamera(const Registry& registry) {
     }
     return &state->cameras[static_cast<std::size_t>(state->activeId)];
 }
-
 
 inline void setupSystem(Registry& registry) {
     const auto* windowState = registry.getObject<window::WindowState>(window::kMainWindowStateName);
@@ -140,7 +137,7 @@ inline void inputSystem(Registry& registry) {
     GLFWwindow* window = windowState->handle;
 
     const bool escapePressed = glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS;
-    if (escapePressed && ! cameraState->escapeWasPressed && cameraState->cursorCaptured) {
+    if (escapePressed && !cameraState->escapeWasPressed && cameraState->cursorCaptured) {
         glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
         if (glfwRawMouseMotionSupported() == GLFW_TRUE) {
             glfwSetInputMode(window, GLFW_RAW_MOUSE_MOTION, GLFW_FALSE);
@@ -150,9 +147,10 @@ inline void inputSystem(Registry& registry) {
     }
     cameraState->escapeWasPressed = escapePressed;
 
-    const bool leftMouseButtonPressed = glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS;
+    const bool leftMouseButtonPressed =
+        glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS;
     if (!cameraState->cursorCaptured) {
-        if (leftMouseButtonPressed && ! cameraState->leftMouseButtonPressed) {
+        if (leftMouseButtonPressed && !cameraState->leftMouseButtonPressed) {
             glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
             if (glfwRawMouseMotionSupported() == GLFW_TRUE) {
                 glfwSetInputMode(window, GLFW_RAW_MOUSE_MOTION, GLFW_TRUE);
@@ -181,7 +179,6 @@ inline void inputSystem(Registry& registry) {
 
     freeRoam->yaw += dx * freeRoam->mouseSensitivity;
     freeRoam->pitch = std::clamp(freeRoam->pitch + dy * freeRoam->mouseSensitivity, -89.0f, 89.0f);
-
 
     const glm::vec3 lookDir = directionFromYawPitchDegrees(freeRoam->yaw, freeRoam->pitch);
     constexpr glm::vec3 worldUp{0.0f, 1.0f, 0.0f};
@@ -224,8 +221,8 @@ inline void coordDebugSystem(Registry& registry) {
     const bool pPressed = glfwGetKey(windowState->handle, GLFW_KEY_P) == GLFW_PRESS;
     if (pPressed && !pWasPressed) {
         if (const Camera* cam = activeCamera(registry); cam != nullptr) {
-            LOG_INFO("Active camera position: {}, {}, {}",
-                     cam->position.x, cam->position.y, cam->position.z);
+            LOG_INFO("Active camera position: {}, {}, {}", cam->position.x, cam->position.y,
+                     cam->position.z);
         }
     }
     pWasPressed = pPressed;
@@ -240,8 +237,8 @@ inline void switchSystem(Registry& registry) {
 
     const bool switchPressed = glfwGetKey(windowState->handle, GLFW_KEY_C) == GLFW_PRESS;
     if (switchPressed && !cameraState->switchWasPressed) {
-        cameraState->activeId =
-            cameraState->activeId == CameraId::FreeRoam ? CameraId::SlideFollow : CameraId::FreeRoam;
+        cameraState->activeId = cameraState->activeId == CameraId::FreeRoam ? CameraId::SlideFollow
+                                                                            : CameraId::FreeRoam;
         cameraState->firstMouse = true;
         LOG_INFO("Switched active camera to {}",
                  cameraState->activeId == CameraId::FreeRoam ? "Free roam" : "Slide POV");
@@ -275,7 +272,6 @@ inline void syncCamerasFromEntitiesSystem(Registry& registry) {
     }
 }
 
-
 inline void updateMatricesSystem(Registry& registry) {
     auto* cameraState = registry.getObject<CameraState>(kCameraStateName);
     const auto* windowState = registry.getObject<window::WindowState>(window::kMainWindowStateName);
@@ -286,17 +282,21 @@ inline void updateMatricesSystem(Registry& registry) {
     int width{0}, height{0};
     glfwGetFramebufferSize(windowState->handle, &width, &height);
 
-    const float aspect = height > 0 ? static_cast<float>(width) / static_cast<float>(height) : 16.0f / 9.0f;
+    const float aspect =
+        height > 0 ? static_cast<float>(width) / static_cast<float>(height) : 16.0f / 9.0f;
     constexpr glm::vec3 worldUp{0.0f, 1.0f, 0.0f};
 
     for (auto& camera : cameraState->cameras) {
         const float yawRad = glm::radians(camera.yaw);
         const float pitchRad = glm::radians(camera.pitch);
-        camera.front = glm::normalize(glm::vec3(std::cos(pitchRad) * std::cos(yawRad), std::sin(pitchRad), std::cos(pitchRad) * std::sin(yawRad)));
+        camera.front =
+            glm::normalize(glm::vec3(std::cos(pitchRad) * std::cos(yawRad), std::sin(pitchRad),
+                                     std::cos(pitchRad) * std::sin(yawRad)));
         camera.up = worldUp;
         camera.aspect = aspect;
         camera.viewMatrix = glm::lookAt(camera.position, camera.position + camera.front, camera.up);
-        camera.projMatrix = glm::perspective(glm::radians(camera.fovYDeg), camera.aspect, camera.nearZ, camera.farZ);
+        camera.projMatrix = glm::perspective(glm::radians(camera.fovYDeg), camera.aspect,
+                                             camera.nearZ, camera.farZ);
         camera.viewProjMatrix = camera.projMatrix * camera.viewMatrix;
         camera.frustum = Frustum::fromViewProjection(camera.viewProjMatrix);
     }
@@ -322,8 +322,8 @@ inline void debugPrintCameraSystem(Registry& registry) {
     std::cout << "Position: " << camera->position.x << ", " << camera->position.y << ", "
               << camera->position.z << "\n";
 
-    std::cout << "Front:    " << camera->front.x << ", " << camera->front.y << ", " << camera->front.z
-              << "\n";
+    std::cout << "Front:    " << camera->front.x << ", " << camera->front.y << ", "
+              << camera->front.z << "\n";
 
     std::cout << "Yaw/Pitch: " << camera->yaw << " / " << camera->pitch << "\n";
 
@@ -342,6 +342,6 @@ inline void debugPrintCameraSystem(Registry& registry) {
     std::cout.flush();
 }
 
-}
+}  // namespace camera
 
 #endif  // CG_OPENGL_PROJECT_CAMERA_HPP

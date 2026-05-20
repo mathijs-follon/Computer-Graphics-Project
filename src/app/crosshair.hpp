@@ -74,9 +74,8 @@ inline void setupSystem(Registry& registry) {
 inline void renderSystem(Registry& registry) {
     const auto* state = registry.getObject<CrosshairState>(kCrosshairStateName);
     const auto* windowState = registry.getObject<window::WindowState>(window::kMainWindowStateName);
-    if (state == nullptr || !state->visible || state->program.id == 0U ||
-        state->quad == nullptr || state->quad->vao == 0U || windowState == nullptr ||
-        windowState->handle == nullptr) {
+    if (state == nullptr || !state->visible || state->program.id == 0U || state->quad == nullptr ||
+        state->quad->vao == 0U || windowState == nullptr || windowState->handle == nullptr) {
         return;
     }
 

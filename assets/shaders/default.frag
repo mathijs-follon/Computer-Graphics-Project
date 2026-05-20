@@ -54,9 +54,6 @@ vec3 addPointLighting(PointLight light, vec3 normal, vec3 viewDir)
 
 void main() {
     vec4 sampled = texture(u_albedo, v_uv);
-    // Alpha-test cutout: model materials flagged BLEND in the gltf (foliage, kelp,
-    // lattice grates) carry per-pixel cutout masks. Without this, the texture's
-    // padding regions render as opaque black rectangles around leaves/grates.
     if (sampled.a < 0.5) {
         discard;
     }
@@ -65,8 +62,6 @@ void main() {
     vec3 viewDir = normalize(u_viewPos - v_frag_pos);
     vec3 n = normalize(v_worldNormal);
 
-    // Sky/bounce ambient so shadow-side surfaces never collapse to near-black with
-    // only a single grazing sun. Tinted neutral so it doesn't fight the per-light colour.
     vec3 shaded = vec3(0.18);
     for (int i = 0; i < LIGHT_COUNT_MAX; i++) {
         if (u_lights[i].on == 1) {

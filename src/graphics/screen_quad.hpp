@@ -1,7 +1,6 @@
 #ifndef CG_OPENGL_PROJECT_SCREEN_QUAD_HPP
 #define CG_OPENGL_PROJECT_SCREEN_QUAD_HPP
 
-
 #include <array>
 #include <cstdint>
 
@@ -35,10 +34,8 @@ struct ScreenQuad {
 
 inline void buildScreenQuad(ScreenQuad& quad) {
     constexpr std::array<float, 16> kVertices = {
-        -1.0f, -1.0f, 0.0f, 0.0f,
-         1.0f, -1.0f, 1.0f, 0.0f,
-         1.0f,  1.0f, 1.0f, 1.0f,
-        -1.0f,  1.0f, 0.0f, 1.0f,
+        -1.0f, -1.0f, 0.0f, 0.0f, 1.0f,  -1.0f, 1.0f, 0.0f,
+        1.0f,  1.0f,  1.0f, 1.0f, -1.0f, 1.0f,  0.0f, 1.0f,
     };
     constexpr std::array<std::uint32_t, 6> kIndices = {0U, 1U, 2U, 0U, 2U, 3U};
 

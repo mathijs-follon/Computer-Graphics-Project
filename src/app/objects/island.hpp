@@ -41,8 +41,8 @@ inline void applyWaterShaderToIslandMeshes(Registry& registry, const std::string
             continue;
         }
 
-        auto* mesh =
-            registry.getObject<rendering::RenderMeshInstance>(meshKeyPrefix + std::to_string(meshIndex));
+        auto* mesh = registry.getObject<rendering::RenderMeshInstance>(meshKeyPrefix +
+                                                                       std::to_string(meshIndex));
         if (mesh == nullptr) {
             continue;
         }

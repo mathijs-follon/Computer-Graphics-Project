@@ -305,8 +305,9 @@ buildGpuRawMeshInstances(const SpawnAssets& assets, const std::vector<glm::vec3>
     return out;
 }
 
-[[nodiscard]] glm::mat4 buildIdentityWorldModelMatrix(const std::vector<rendering::GpuVertex>& vertices,
-                                                      const RenderObjectSpawnRequest& request) {
+[[nodiscard]] glm::mat4
+buildIdentityWorldModelMatrix(const std::vector<rendering::GpuVertex>& vertices,
+                              const RenderObjectSpawnRequest& request) {
     glm::vec3 boundsMin(std::numeric_limits<float>::max());
     glm::vec3 boundsMax(std::numeric_limits<float>::lowest());
     for (const rendering::GpuVertex& vertex : vertices) {
@@ -327,11 +328,9 @@ buildGpuRawMeshInstances(const SpawnAssets& assets, const std::vector<glm::vec3>
     return modelMatrix;
 }
 
-std::vector<rendering::RenderMeshInstance>
-buildGpuRawIndexedMeshInstances(const SpawnAssets& assets,
-                                const std::vector<rendering::GpuVertex>* rawMeshVertices,
-                                const std::vector<std::uint32_t>* rawMeshIndices,
-                                const RenderObjectSpawnRequest& request) {
+std::vector<rendering::RenderMeshInstance> buildGpuRawIndexedMeshInstances(
+    const SpawnAssets& assets, const std::vector<rendering::GpuVertex>* rawMeshVertices,
+    const std::vector<std::uint32_t>* rawMeshIndices, const RenderObjectSpawnRequest& request) {
     std::vector<rendering::RenderMeshInstance> out;
     if (rawMeshVertices == nullptr || rawMeshIndices == nullptr || rawMeshVertices->empty() ||
         rawMeshIndices->empty()) {

@@ -86,9 +86,8 @@ inline void setupSystem(Registry& registry) {
     }
 
     ChromaState state{};
-    state.program =
-        asset::AssetLoader::loadShaderProgram(std::string(kVertexShaderPath),
-                                              std::string(kFragmentShaderPath));
+    state.program = asset::AssetLoader::loadShaderProgram(std::string(kVertexShaderPath),
+                                                          std::string(kFragmentShaderPath));
     if (state.program.id == 0U) {
         LOG_WARN("Chroma overlay shader failed to load; overlay disabled");
         return;
@@ -115,8 +114,7 @@ inline void setupSystem(Registry& registry) {
 
 inline void inputSystem(Registry& registry) {
     auto* state = registry.getObject<ChromaState>(kChromaStateName);
-    const auto* windowState =
-        registry.getObject<window::WindowState>(window::kMainWindowStateName);
+    const auto* windowState = registry.getObject<window::WindowState>(window::kMainWindowStateName);
     if (state == nullptr || windowState == nullptr || windowState->handle == nullptr) {
         return;
     }

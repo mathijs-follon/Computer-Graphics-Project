@@ -58,17 +58,14 @@ struct Frustum {
     static Frustum fromViewProjection(const glm::mat4& viewProjection) {
         Frustum frustum{};
 
-        // Gribb/Hartmann plane extraction needs rows of the view-projection matrix.
-        // GLM stores matrices column-major, so `viewProjection[i]` is column i, not row i;
-        // we reconstruct the rows explicitly to avoid that footgun.
-        const glm::vec4 rowX{viewProjection[0][0], viewProjection[1][0],
-                             viewProjection[2][0], viewProjection[3][0]};
-        const glm::vec4 rowY{viewProjection[0][1], viewProjection[1][1],
-                             viewProjection[2][1], viewProjection[3][1]};
-        const glm::vec4 rowZ{viewProjection[0][2], viewProjection[1][2],
-                             viewProjection[2][2], viewProjection[3][2]};
-        const glm::vec4 rowW{viewProjection[0][3], viewProjection[1][3],
-                             viewProjection[2][3], viewProjection[3][3]};
+        const glm::vec4 rowX{viewProjection[0][0], viewProjection[1][0], viewProjection[2][0],
+                             viewProjection[3][0]};
+        const glm::vec4 rowY{viewProjection[0][1], viewProjection[1][1], viewProjection[2][1],
+                             viewProjection[3][1]};
+        const glm::vec4 rowZ{viewProjection[0][2], viewProjection[1][2], viewProjection[2][2],
+                             viewProjection[3][2]};
+        const glm::vec4 rowW{viewProjection[0][3], viewProjection[1][3], viewProjection[2][3],
+                             viewProjection[3][3]};
 
         const std::array combinations = {
             rowW + rowX,  // Left

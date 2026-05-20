@@ -6,7 +6,6 @@
 
 class App {
 public:
-
     struct Time {
         double lastFrameTime{0.0};
         double currentTime{0.0};

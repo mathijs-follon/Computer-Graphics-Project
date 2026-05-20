@@ -33,5 +33,4 @@ struct SlideRiderEntity {
     float modelPitchCorrectionDeg = 0.0f;
 };
 
-
 #endif  // CG_OPENGL_PROJECT_PLAYERS_HPP
