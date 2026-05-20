@@ -1,7 +1,6 @@
 #ifndef CG_OPENGL_PROJECT_PLAYERS_HPP
 #define CG_OPENGL_PROJECT_PLAYERS_HPP
 
-#include <glm/glm.hpp>
 #include <string>
 
 struct ActivePlayer {
