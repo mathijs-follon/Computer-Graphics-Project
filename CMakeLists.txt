@@ -6,7 +6,6 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_SCAN_FOR_MODULES OFF)
-enable_testing()
 
 include(FetchContent)
 find_package(OpenGL REQUIRED)
@@ -150,8 +149,3 @@ if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/assets")
             VERBATIM)
 endif()
 
-add_executable(template_test
-        tests/template_test.cpp
-)
-
-target_compile_options(template_test PRIVATE ${PROJECT_WARNING_FLAGS})
