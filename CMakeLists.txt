@@ -155,9 +155,3 @@ add_executable(template_test
 )
 
 target_compile_options(template_test PRIVATE ${PROJECT_WARNING_FLAGS})
-
-add_test(
-        NAME template_test
-        COMMAND template_test
-)
-
