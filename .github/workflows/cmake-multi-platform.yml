@@ -55,7 +55,8 @@ jobs:
           wayland-protocols \
           libxinerama-dev \
           libxcursor-dev \
-          libxi-dev
+          libxi-dev \
+          libglm-dev
 
     - name: Bootstrap vcpkg (Windows)
       if: runner.os == 'Windows'
@@ -63,7 +64,7 @@ jobs:
       run: |
         git clone https://github.com/microsoft/vcpkg.git "${{ github.workspace }}/vcpkg"
         "${{ github.workspace }}/vcpkg/bootstrap-vcpkg.sh"
-        "${{ github.workspace }}/vcpkg/vcpkg" install glfw3:x64-windows spdlog:x64-windows
+        "${{ github.workspace }}/vcpkg/vcpkg" install glfw3:x64-windows spdlog:x64-windows glm:x64-windows assimp:x64-windows
 
     - name: Set reusable strings
       # Turn repeated input strings (such as the build output directory) into step outputs. These step outputs can be used throughout the workflow file.
