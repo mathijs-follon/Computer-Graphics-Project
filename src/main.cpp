@@ -2,7 +2,6 @@
 #include "app/bloom.hpp"
 #include "app/chroma.hpp"
 #include "app/crosshair.hpp"
-#include "app/hud.hpp"
 #include "app/interactive_lights.hpp"
 #include "app/objects/island.hpp"
 #include "app/objects/glijbaan.hpp"
@@ -27,7 +26,6 @@ void setupInitSystems(App& app) {
     app.addInitSystem(InitStage::Setup, interactive_lights::setupSystem);
     app.addInitSystem(InitStage::Setup, bloom::setupSystem);
     app.addInitSystem(InitStage::Setup, crosshair::setupSystem);
-    app.addInitSystem(InitStage::Setup, hud::setupSystem);
 }
 
 void setupLoopSystems(App& app) {
@@ -42,7 +40,6 @@ void setupLoopSystems(App& app) {
     app.addLoopSystem(LoopStage::Update, glijbaan::rideSystem);
     app.addLoopSystem(LoopStage::Update, chroma::inputSystem);
     app.addLoopSystem(LoopStage::Update, bloom::inputSystem);
-    app.addLoopSystem(LoopStage::Update, hud::inputSystem);
     // Picking runs after camera::inputSystem so it sees the up-to-date
     // cursorCaptured flag; only fires when the cursor is captured.
     app.addLoopSystem(LoopStage::Update, interactive_lights::inputSystem);
@@ -63,7 +60,6 @@ void setupLoopSystems(App& app) {
     app.addLoopSystem(LoopStage::Render, chroma::renderSystem);
     app.addLoopSystem(LoopStage::Render, bloom::postProcessSystem);
     app.addLoopSystem(LoopStage::Render, crosshair::renderSystem);
-    app.addLoopSystem(LoopStage::Render, hud::renderSystem);
     app.addLoopSystem(LoopStage::Render, rendering::endRenderStateSystem);
 
     // End
