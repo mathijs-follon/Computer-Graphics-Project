@@ -66,3 +66,15 @@ The repository is organized around a small engine-like pipeline, with separate s
 ### Session Logging
 
 Our session logs can be found here [@Tarudahat logs](/logging/taru.md), [@mathijs-follon logs](/logging/mathijs.md)
+
+### Credits
+
+- **Sea keep model**:
+  This work is based on "Sea Keep "Lonely Watcher"" (https://sketchfab.com/3d-models/sea-keep-lonely-watcher-09a15a0c14cb4accaf060a92bc70413d) by Artjoms Horosilovs (https://sketchfab.com/Artjoms_Horosilovs) licensed under CC-BY-NC-SA-4.0 (http://creativecommons.org/licenses/by-nc-sa/4.0/)
+- **Dinosaur model**:
+  This work is based on "Dinosaur" (https://sketchfab.com/3d-models/dinosaur-c743536f3c8e48049a00f19c8f8f6d4a) by Q*Bert Reynolds (https://sketchfab.com/318arcade) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+- **Utah Teapot** (for initial testing):
+  If you use this 3D model in your project be sure to copy paste this credit wherever you share it:
+This work is based on "The Utah Teapot" (https://sketchfab.com/3d-models/the-utah-teapot-1092c2832df14099807f66c8b792374d) by 3D graphics 101 (https://sketchfab.com/3dgraphics) licensed under CC-BY-NC-4.0 (http://creativecommons.org/licenses/by-nc/4.0/)
+
+
