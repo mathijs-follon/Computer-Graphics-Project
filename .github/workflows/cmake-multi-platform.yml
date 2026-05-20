@@ -52,7 +52,10 @@ jobs:
           libspdlog-dev \
           libxkbcommon-dev \
           libwayland-dev \
-          wayland-protocols
+          wayland-protocols \
+          libxinerama-dev \
+          libxcursor-dev \
+          libxi-dev
 
     - name: Bootstrap vcpkg (Windows)
       if: runner.os == 'Windows'
