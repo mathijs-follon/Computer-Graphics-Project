@@ -17,7 +17,7 @@ A C++23 and OpenGL project built with CMake that showcases an interactive 3D sce
 
 ## Screenshots
 
-### Header
+### Bird Eye
 
 ![Header](docs/images/header.png)
 
