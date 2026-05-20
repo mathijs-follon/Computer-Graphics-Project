@@ -103,6 +103,7 @@ add_executable(CG_OpenGL_Project
         src/graphics/geometry.hpp
         src/graphics/rendering.hpp
         src/graphics/screen_quad.hpp
+        src/
         src/app/players.hpp
         src/asset/asset.hpp
         src/asset/asset_paths.hpp
