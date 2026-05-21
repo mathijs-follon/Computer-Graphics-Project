@@ -1,11 +1,10 @@
 #ifndef CG_OPENGL_PROJECT_LIGHTS_HPP
 #define CG_OPENGL_PROJECT_LIGHTS_HPP
 
-#include "asset/render_object_spawner.hpp"
 #include "asset/shader.hpp"
-#include "graphics/rendering.hpp"
 #include "world/registry.hpp"
 #include <glm/ext/vector_float3.hpp>
+#include <glm/gtc/type_ptr.hpp>
 #include <vector>
 
 namespace lights {
@@ -30,11 +29,6 @@ struct Light {
 
 // spawn the models & set initial lighting
 inline void setupSystem(Registry& registry) {
-    static constexpr std::array<const char*, 1> kModelCandidates = {
-        "assets/models/the_utah_teapot/scene.gltf",
-    };
-    static constexpr std::string_view kSpawnPrefix = "scene.island.light";
-
     static constexpr Light Sun = Light{{{500.0f, 0.0f, 0.0f}, {100.0f, 100.0f, 100.0f}},
                                        {1.0f, 0.8f, 0.8f},
                                        0.00000001f,
@@ -44,60 +38,6 @@ inline void setupSystem(Registry& registry) {
                                        0.3};
 
     std::vector<Light> lights{Sun};
-
-    Transform kTransform{};
-    // spawn pots
-    for (uint i = 0; i < asset::ShaderProgram::MAX_LIGHT_COUNT; i++) {
-        // init transforms
-        kTransform.position *= 10 * (1 + i);
-        lights.push_back({kTransform});
-
-        asset::RenderObjectSpawnRequest request{};
-        request.namePrefix = std::string(kSpawnPrefix);
-
-        request.vertexShaderPath = "assets/shaders/default.vert";
-        request.fragmentShaderPath = "assets/shaders/default.frag";
-        request.overrideTexturePath = "assets/textures/fallback.png";
-
-        request.useModelMaterialTexture = true;
-        request.worldPosition = kTransform.position;
-        request.uniformTargetSize = kTransform.uniformTargetSize;
-        request.centerModel = true;
-        request.layer = rendering::RenderLayer::Sky;
-        request.enableFrustumCull = true;
-
-        // spawn pots at light positions
-        for (const char* candidate : kModelCandidates) {
-            if (asset::resolveAssetPath(candidate) == std::filesystem::path(candidate) &&
-                !std::filesystem::exists(candidate)) {
-                continue;
-            }
-
-            request.modelPath = candidate;
-            const asset::RenderObjectSpawnResult result =
-                asset::spawnModelAsRenderMeshes(registry, request);
-            if (!result.error.empty()) {
-                LOG_WARN("light model spawn candidate '{}' failed: {}", candidate, result.error);
-                continue;
-            }
-
-            const glm::mat4 pivotToOrigin = glm::translate(glm::mat4(1.0f), -kTransform.position);
-            const glm::mat4 pivotBack = glm::translate(glm::mat4(1.0f), kTransform.position);
-            const glm::mat4 worldScale =
-                pivotBack * glm::scale(glm::mat4(1.0f), kTransform.scale) * pivotToOrigin;
-
-            const std::string meshPrefix = request.namePrefix + ".mesh.";
-            for (auto [name, mesh] : registry.getEntries<rendering::RenderMeshInstance>()) {
-                if (mesh == nullptr || !name.starts_with(meshPrefix)) {
-                    continue;
-                }
-                mesh->modelMatrix = worldScale * mesh->modelMatrix;
-            }
-
-            LOG_INFO("Spawned '{}' from '{}' ({} meshes)", request.namePrefix, candidate,
-                     result.meshCount);
-        }
-    }
 
     // move lighting data into mesh shaders that support it
     for (const asset::ShaderProgram* meshShaderPrgm : registry.getObjects<asset::ShaderProgram>()) {

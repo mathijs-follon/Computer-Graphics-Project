@@ -3,9 +3,9 @@
 
 // Bloom post-processing. Press 'B' to toggle.
 
-#include "app/app.hpp"
 #include "asset/asset.hpp"
 #include "graphics/screen_quad.hpp"
+#include "graphics/fbo.hpp"
 #include "graphics/window.hpp"
 #include "log/log.hpp"
 #include "world/registry.hpp"
@@ -27,12 +27,8 @@ inline constexpr std::string_view kCompositeFragPath = "assets/shaders/bloom_com
 inline constexpr float kBloomBufferScale = 0.5f;
 inline constexpr int kBlurIterations = 5;
 
-struct FboSet {
-    GLuint sceneFbo = 0U;
-    GLuint sceneColor = 0U;
-    GLuint sceneDepth = 0U;
-    int sceneWidth = 0;
-    int sceneHeight = 0;
+struct BloomFbos {
+    graphics::SceneFbo sceneFbo;
 
     GLuint pingFbo = 0U;
     GLuint pingColor = 0U;
@@ -41,33 +37,24 @@ struct FboSet {
     int bloomWidth = 0;
     int bloomHeight = 0;
 
-    FboSet() = default;
-    FboSet(const FboSet&) = delete;
-    FboSet& operator=(const FboSet&) = delete;
-    FboSet(FboSet&&) = delete;
-    FboSet& operator=(FboSet&&) = delete;
+    BloomFbos() = default;
+    BloomFbos(const BloomFbos&) = delete;
+    BloomFbos& operator=(const BloomFbos&) = delete;
+    BloomFbos(BloomFbos&&) = delete;
+    BloomFbos& operator=(BloomFbos&&) = delete;
 
-    ~FboSet() {
-        if (sceneFbo != 0U) {
-            glDeleteFramebuffers(1, &sceneFbo);
-        }
+    ~BloomFbos() {
         if (pingFbo != 0U) {
             glDeleteFramebuffers(1, &pingFbo);
         }
         if (pongFbo != 0U) {
             glDeleteFramebuffers(1, &pongFbo);
         }
-        if (sceneColor != 0U) {
-            glDeleteTextures(1, &sceneColor);
-        }
         if (pingColor != 0U) {
             glDeleteTextures(1, &pingColor);
         }
         if (pongColor != 0U) {
             glDeleteTextures(1, &pongColor);
-        }
-        if (sceneDepth != 0U) {
-            glDeleteRenderbuffers(1, &sceneDepth);
         }
     }
 };
@@ -95,51 +82,21 @@ struct BloomState {
     GLint locCompositeIntensity = -1;
 
     std::shared_ptr<graphics::ScreenQuad> quad{};
-    std::shared_ptr<FboSet> fbos{};
+    std::shared_ptr<BloomFbos> fbos{};
 };
 
-inline GLuint createColorTexture(int width, int height) {
-    GLuint texture = 0U;
-    glGenTextures(1, &texture);
-    if (texture == 0U) {
-        return 0U;
-    }
-    glBindTexture(GL_TEXTURE_2D, texture);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, width, height, 0, GL_RGBA, GL_FLOAT, nullptr);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-    glBindTexture(GL_TEXTURE_2D, 0);
-    return texture;
-}
-
-inline bool buildFboSet(FboSet& fbos, int fbWidth, int fbHeight) {
-    fbos.sceneWidth = fbWidth;
-    fbos.sceneHeight = fbHeight;
+inline bool buildFboSet(BloomFbos& fbos, int fbWidth, int fbHeight) {
     fbos.bloomWidth =
         std::max(1, static_cast<int>(static_cast<float>(fbWidth) * kBloomBufferScale));
     fbos.bloomHeight =
         std::max(1, static_cast<int>(static_cast<float>(fbHeight) * kBloomBufferScale));
 
-    fbos.sceneColor = createColorTexture(fbWidth, fbHeight);
-    glGenRenderbuffers(1, &fbos.sceneDepth);
-    glBindRenderbuffer(GL_RENDERBUFFER, fbos.sceneDepth);
-    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT24, fbWidth, fbHeight);
-    glBindRenderbuffer(GL_RENDERBUFFER, 0);
-
-    glGenFramebuffers(1, &fbos.sceneFbo);
-    glBindFramebuffer(GL_FRAMEBUFFER, fbos.sceneFbo);
-    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, fbos.sceneColor, 0);
-    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER,
-                              fbos.sceneDepth);
-    if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
-        LOG_ERROR("Bloom scene FBO incomplete");
-        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    bool SceneFboBuildStatus = graphics::buildSceneFbo(fbos.sceneFbo, fbWidth, fbHeight);
+    if (!SceneFboBuildStatus) {
         return false;
     }
 
-    fbos.pingColor = createColorTexture(fbos.bloomWidth, fbos.bloomHeight);
+    fbos.pingColor = graphics::createColorTexture(fbos.bloomWidth, fbos.bloomHeight);
     glGenFramebuffers(1, &fbos.pingFbo);
     glBindFramebuffer(GL_FRAMEBUFFER, fbos.pingFbo);
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, fbos.pingColor, 0);
@@ -149,7 +106,7 @@ inline bool buildFboSet(FboSet& fbos, int fbWidth, int fbHeight) {
         return false;
     }
 
-    fbos.pongColor = createColorTexture(fbos.bloomWidth, fbos.bloomHeight);
+    fbos.pongColor = graphics::createColorTexture(fbos.bloomWidth, fbos.bloomHeight);
     glGenFramebuffers(1, &fbos.pongFbo);
     glBindFramebuffer(GL_FRAMEBUFFER, fbos.pongFbo);
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, fbos.pongColor, 0);
@@ -167,22 +124,16 @@ inline bool ensureFbosForSize(BloomState& state, int fbWidth, int fbHeight) {
     if (fbWidth <= 0 || fbHeight <= 0) {
         return false;
     }
-    if (state.fbos != nullptr && state.fbos->sceneWidth == fbWidth &&
-        state.fbos->sceneHeight == fbHeight) {
+    if (state.fbos != nullptr && state.fbos->sceneFbo.width == fbWidth &&
+        state.fbos->sceneFbo.height == fbHeight) {
         return true;
     }
-    auto fresh = std::make_shared<FboSet>();
+    auto fresh = std::make_shared<BloomFbos>();
     if (!buildFboSet(*fresh, fbWidth, fbHeight)) {
         return false;
     }
     state.fbos = std::move(fresh);
     return true;
-}
-
-inline void getFramebufferSize(GLFWwindow* window, int& width, int& height) {
-    width = 0;
-    height = 0;
-    glfwGetFramebufferSize(window, &width, &height);
 }
 
 inline void setupSystem(Registry& registry) {
@@ -246,12 +197,12 @@ inline void beginScenePassSystem(Registry& registry) {
 
     int fbWidth = 0;
     int fbHeight = 0;
-    getFramebufferSize(windowState->handle, fbWidth, fbHeight);
+    graphics::getFramebufferSize(windowState->handle, fbWidth, fbHeight);
     if (!ensureFbosForSize(*state, fbWidth, fbHeight)) {
         return;
     }
 
-    glBindFramebuffer(GL_FRAMEBUFFER, state->fbos->sceneFbo);
+    glBindFramebuffer(GL_FRAMEBUFFER, state->fbos->sceneFbo.fbo);
     glViewport(0, 0, fbWidth, fbHeight);
     // Match window::clearWindowSystem so the bloom-on view doesn't show a
     // different background than bloom-off.
@@ -273,7 +224,7 @@ inline void postProcessSystem(Registry& registry) {
 
     int fbWidth = 0;
     int fbHeight = 0;
-    getFramebufferSize(windowState->handle, fbWidth, fbHeight);
+    graphics::getFramebufferSize(windowState->handle, fbWidth, fbHeight);
     if (fbWidth <= 0 || fbHeight <= 0) {
         return;
     }
@@ -287,13 +238,13 @@ inline void postProcessSystem(Registry& registry) {
     glDepthMask(GL_FALSE);
     glDisable(GL_BLEND);
 
-    const FboSet& fbos = *state->fbos;
+    const BloomFbos& fbos = *state->fbos;
 
     glBindFramebuffer(GL_FRAMEBUFFER, fbos.pingFbo);
     glViewport(0, 0, fbos.bloomWidth, fbos.bloomHeight);
     glUseProgram(state->brightProgram.id);
     glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, fbos.sceneColor);
+    glBindTexture(GL_TEXTURE_2D, fbos.sceneFbo.color);
     if (state->locBrightScene >= 0) {
         glUniform1i(state->locBrightScene, 0);
     }
@@ -333,7 +284,7 @@ inline void postProcessSystem(Registry& registry) {
     glUseProgram(state->compositeProgram.id);
 
     glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, fbos.sceneColor);
+    glBindTexture(GL_TEXTURE_2D, fbos.sceneFbo.color);
     if (state->locCompositeScene >= 0) {
         glUniform1i(state->locCompositeScene, 0);
     }

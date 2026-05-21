@@ -4,6 +4,7 @@
 #include "asset/asset.hpp"
 #include "asset/asset_paths.hpp"
 #include "asset/render_object_spawner.hpp"
+#include "glad/gl.h"
 #include "graphics/rendering.hpp"
 #include "log/log.hpp"
 #include "world/registry.hpp"
@@ -22,6 +23,11 @@ struct Transform {
     glm::vec3 rotationDeg{0.0f, 0.0f, 0.0f};
     glm::vec3 scale{2.0f, 2.0f, 2.0f};
     float uniformTargetSize = 1200.0f;
+};
+
+struct IslandState {
+    float time{};
+    GLint locTime = -1;
 };
 
 inline bool isIslandWaterMeshName(const std::string_view meshName) {
@@ -136,6 +142,10 @@ inline void setupSystem(Registry& registry) {
             "assets/shaders/water.vert", "assets/shaders/water.frag");
         applyWaterShaderToIslandMeshes(registry, request.namePrefix, islandModel, waterProgram);
 
+        // IslandState state{0.0, -1};
+        // state.locTime = glGetUniformLocation(waterProgram.id, "u_time");
+        // registry.registerObject("scene.island.state", state);
+
         LOG_INFO("Spawned '{}' from '{}' ({} meshes, texture={})", request.namePrefix, candidate,
                  result.meshCount, textureSelectionToString(result.textureSelection));
         return;
@@ -143,6 +153,23 @@ inline void setupSystem(Registry& registry) {
 
     LOG_WARN("Could not find sea_keep model. Tried {} candidate path(s).", kModelCandidates.size());
 }
+
+// inline void updateWaterTime(Registry& registry) {
+//     auto* mesh =
+//     registry.getObject<rendering::RenderMeshInstance>("scene.island.sea_keep.mesh.5"); auto*
+//     islandState = registry.getObject<IslandState>("scene.island.state"); const auto* time =
+//     registry.getObject<App::Time>("app.time");
+
+//     if (mesh == nullptr || mesh->shaderProgram == 0 || time == nullptr || islandState == nullptr
+//     ||
+//         islandState->locTime == 0)
+//         return;
+
+//     glUseProgram(mesh->shaderProgram);
+//     glUniform1f(islandState->locTime, islandState->time);
+//     islandState->time += 10 * time->deltaTime;
+//     glUseProgram(0);
+// }
 
 }  // namespace island
 
