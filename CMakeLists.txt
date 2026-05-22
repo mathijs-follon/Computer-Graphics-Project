@@ -9,6 +9,7 @@ set(CMAKE_CXX_SCAN_FOR_MODULES OFF)
 
 include(FetchContent)
 find_package(OpenGL REQUIRED)
+find_package(glm CONFIG REQUIRED)
 
 if(EXISTS "/usr/include/minizip")
     include_directories(SYSTEM "/usr/include/minizip")
@@ -134,6 +135,7 @@ target_link_libraries(CG_OpenGL_Project PRIVATE
         OpenGL::GL
         glad_gl
         glfw
+        glm::glm
         spdlog::spdlog
         assimp
         stb_image
