@@ -81,7 +81,7 @@ struct GlijbaanState {
     GlijbaanPath path{};
     std::vector<glm::vec3> glijbaanCubicBezierSamples{};
     std::vector<rendering::GpuVertex> halfPipeVertices{};
-    std::vector<uint32_t32_t> halfPipeIndices{};
+    std::vector<uint32_t> halfPipeIndices{};
     std::vector<RiderMeshBinding> riderMeshes{};
 
     double rideDistance = 0.0;
