@@ -118,6 +118,7 @@ add_executable(CG_OpenGL_Project
         src/app/crosshair.hpp
         src/app/interactive_lights.hpp
         src/app/objects/lights.hpp
+        src/app/convolution.hpp
 )
 
 # Remove DEBUG to disable logs to LOG_CONSOLE
