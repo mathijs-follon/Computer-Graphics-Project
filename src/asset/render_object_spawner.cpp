@@ -287,7 +287,7 @@ buildGpuRawMeshInstances(const SpawnAssets& assets, const std::vector<glm::vec3>
 
     rendering::RenderMeshInstance instance{};
     instance.buffers = std::move(buffers);
-    instance.drawArraysVertexCount = rawVertices->size();
+    instance.drawArraysVertexCount = static_cast<GLsizei>(rawVertices->size());
 
     instance.shaderProgram = assets.program.id;
     instance.shaderLifetime = assets.program.resource;
