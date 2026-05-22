@@ -1,18 +1,14 @@
 #ifndef CG_OPENGL_PROJECT_GEOMETRY_HPP
 #define CG_OPENGL_PROJECT_GEOMETRY_HPP
-#include "log/log.hpp"
 #include <algorithm>
 #include <array>
 #include <glm/ext/matrix_float3x3.hpp>
-#include <glm/ext/matrix_float3x4.hpp>
 #include <glm/ext/matrix_float4x4.hpp>
 #include <glm/ext/vector_float3.hpp>
 #include <glm/glm.hpp>
 #include <glm/geometric.hpp>
-#include <glm/vec3.hpp>
 #include <map>
 #include <optional>
-#include <sys/types.h>
 #include <vector>
 
 struct AABB {
@@ -76,7 +72,7 @@ struct Frustum {
             rowW - rowZ   // Far
         };
 
-        for (std::size_t i = 0; i < 6; ++i) {
+        for (size_t i = 0; i < 6; ++i) {
             const glm::vec4& planeEquation = combinations[i];
 
             auto normal = glm::vec3(planeEquation);
@@ -117,12 +113,12 @@ struct CubicBezierCurve {
     std::map<double, double> arcLengthLUT{};
 
     CubicBezierCurve(const glm::vec3& p0, const glm::vec3& p1, const glm::vec3& p2,
-                     const glm::vec3& p3, uint sampleCount = 32)
+                     const glm::vec3& p3, size_t sampleCount = 32)
         : controlPoints{p0, p1, p2, p3} {
         sampleFD(sampleCount);
     };
 
-    void sampleFD(uint sampleCount) {
+    void sampleFD(size_t sampleCount) {
         if (sampleCount == 0)
             return;
 
@@ -151,7 +147,7 @@ struct CubicBezierCurve {
         arcLengthLUT.insert({0.0, 0.0});
 
         double arclength{};
-        for (uint i = 0; i < sampleCount; i++) {
+        for (size_t i = 0; i < sampleCount; i++) {
             position += delta;
             delta += delta2;
             delta2 += delta3;
