@@ -341,8 +341,7 @@ inline void buildHalfPipeMesh(const std::vector<glm::vec3>& centerLine, float ra
 
     const auto vertexIndex = [vertsPerStation, ringVertexCount](
                                  std::size_t station, std::size_t layer, std::size_t ring) {
-        return static_cast<uint32_t>(station * vertsPerStation + layer * ringVertexCount +
-                                          ring);
+        return static_cast<uint32_t>(station * vertsPerStation + layer * ringVertexCount + ring);
     };
 
     const auto pushTriangle = [&](uint32_t a, uint32_t b, uint32_t c) {
