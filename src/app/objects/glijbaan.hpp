@@ -81,7 +81,7 @@ struct GlijbaanState {
     GlijbaanPath path{};
     std::vector<glm::vec3> glijbaanCubicBezierSamples{};
     std::vector<rendering::GpuVertex> halfPipeVertices{};
-    std::vector<std::uint32_t> halfPipeIndices{};
+    std::vector<uint32_t32_t> halfPipeIndices{};
     std::vector<RiderMeshBinding> riderMeshes{};
 
     double rideDistance = 0.0;
@@ -115,7 +115,7 @@ inline void catmullRomToBezier(const glm::vec3& p0, const glm::vec3& p1, const g
 inline void appendBezierSamples(std::vector<glm::vec3>& out, const glm::vec3& p0,
                                 const glm::vec3& p1, const glm::vec3& p2, const glm::vec3& p3,
                                 std::size_t sampleCount) {
-    const CubicBezierCurve segment{p0, p1, p2, p3, static_cast<uint>(sampleCount)};
+    const CubicBezierCurve segment{p0, p1, p2, p3, static_cast<unsigned int>(sampleCount)};
     if (segment.samplePoints.empty()) {
         return;
     }
@@ -172,7 +172,7 @@ inline GlijbaanPath buildGlijbaanPath(std::size_t samplesPerSegment = kArcLength
         glm::vec3 b3{};
         catmullRomToBezier(knotAt(index - 1), knotAt(index), knotAt(index + 1), knotAt(index + 2),
                            b0, b1, b2, b3);
-        path.segments.emplace_back(b0, b1, b2, b3, static_cast<uint>(samplesPerSegment));
+        path.segments.emplace_back(b0, b1, b2, b3, static_cast<unsigned int>(samplesPerSegment));
 
         double segmentLength = 0.0;
         if (!path.segments.back().arcLengthLUT.empty()) {
@@ -310,7 +310,7 @@ inline void pushGpuVertex(std::vector<rendering::GpuVertex>& verticesOut, const 
 inline void buildHalfPipeMesh(const std::vector<glm::vec3>& centerLine, float radius,
                               float wallThickness, std::size_t ringSegments,
                               std::vector<rendering::GpuVertex>& verticesOut,
-                              std::vector<std::uint32_t>& indicesOut) {
+                              std::vector<uint32_t>& indicesOut) {
     if (centerLine.size() < 2 || ringSegments < 3 || radius <= 0.0f || wallThickness <= 0.0f) {
         return;
     }
@@ -341,17 +341,17 @@ inline void buildHalfPipeMesh(const std::vector<glm::vec3>& centerLine, float ra
 
     const auto vertexIndex = [vertsPerStation, ringVertexCount](
                                  std::size_t station, std::size_t layer, std::size_t ring) {
-        return static_cast<std::uint32_t>(station * vertsPerStation + layer * ringVertexCount +
+        return static_cast<uint32_t>(station * vertsPerStation + layer * ringVertexCount +
                                           ring);
     };
 
-    const auto pushTriangle = [&](std::uint32_t a, std::uint32_t b, std::uint32_t c) {
+    const auto pushTriangle = [&](uint32_t a, uint32_t b, uint32_t c) {
         indicesOut.push_back(a);
         indicesOut.push_back(b);
         indicesOut.push_back(c);
     };
 
-    const auto pushQuad = [&](std::uint32_t a, std::uint32_t b, std::uint32_t c, std::uint32_t d) {
+    const auto pushQuad = [&](uint32_t a, uint32_t b, uint32_t c, uint32_t d) {
         pushTriangle(a, b, c);
         pushTriangle(b, d, c);
     };
@@ -410,24 +410,24 @@ inline void buildHalfPipeMesh(const std::vector<glm::vec3>& centerLine, float ra
 
     for (std::size_t station = 0; station + 1 < stationCount; ++station) {
         for (std::size_t ring = 0; ring + 1 < ringSegments; ++ring) {
-            const std::uint32_t in0 = vertexIndex(station, kLayerInner, ring);
-            const std::uint32_t in1 = vertexIndex(station, kLayerInner, ring + 1);
-            const std::uint32_t in2 = vertexIndex(station + 1, kLayerInner, ring);
-            const std::uint32_t in3 = vertexIndex(station + 1, kLayerInner, ring + 1);
+            const uint32_t in0 = vertexIndex(station, kLayerInner, ring);
+            const uint32_t in1 = vertexIndex(station, kLayerInner, ring + 1);
+            const uint32_t in2 = vertexIndex(station + 1, kLayerInner, ring);
+            const uint32_t in3 = vertexIndex(station + 1, kLayerInner, ring + 1);
             pushQuad(in0, in1, in2, in3);
 
-            const std::uint32_t out0 = vertexIndex(station, kLayerOuter, ring);
-            const std::uint32_t out1 = vertexIndex(station, kLayerOuter, ring + 1);
-            const std::uint32_t out2 = vertexIndex(station + 1, kLayerOuter, ring);
-            const std::uint32_t out3 = vertexIndex(station + 1, kLayerOuter, ring + 1);
+            const uint32_t out0 = vertexIndex(station, kLayerOuter, ring);
+            const uint32_t out1 = vertexIndex(station, kLayerOuter, ring + 1);
+            const uint32_t out2 = vertexIndex(station + 1, kLayerOuter, ring);
+            const uint32_t out3 = vertexIndex(station + 1, kLayerOuter, ring + 1);
             pushQuad(out0, out2, out1, out3);
         }
 
         for (std::size_t ring = 0; ring < ringSegments; ++ring) {
-            const std::uint32_t innerNear = vertexIndex(station, kLayerInner, ring);
-            const std::uint32_t outerNear = vertexIndex(station, kLayerOuter, ring);
-            const std::uint32_t innerFar = vertexIndex(station + 1, kLayerInner, ring);
-            const std::uint32_t outerFar = vertexIndex(station + 1, kLayerOuter, ring);
+            const uint32_t innerNear = vertexIndex(station, kLayerInner, ring);
+            const uint32_t outerNear = vertexIndex(station, kLayerOuter, ring);
+            const uint32_t innerFar = vertexIndex(station + 1, kLayerInner, ring);
+            const uint32_t outerFar = vertexIndex(station + 1, kLayerOuter, ring);
             pushQuad(innerNear, innerFar, outerNear, outerFar);
         }
     }

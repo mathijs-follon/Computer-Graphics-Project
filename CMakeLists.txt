@@ -124,9 +124,6 @@ add_executable(CG_OpenGL_Project
 
 # Remove DEBUG to disable logs to LOG_CONSOLE
 target_compile_definitions(CG_OpenGL_Project PRIVATE DEBUG)
-if(MSVC)
-    target_compile_definitions(CG_OpenGL_Project PRIVATE uint=unsigned int)
-endif()
 
 target_include_directories(CG_OpenGL_Project PRIVATE
         src/
