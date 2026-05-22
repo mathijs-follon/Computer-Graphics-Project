@@ -45,7 +45,7 @@ inline void setupSystem(Registry& registry) {
         if (lightActiveLocation >= 0) {
             glUseProgram(meshShaderPrgm->id);
             // move light data for each light
-            for (uint i = 0; i < asset::ShaderProgram::MAX_LIGHT_COUNT; i++) {
+            for (size_t i = 0; i < asset::ShaderProgram::MAX_LIGHT_COUNT; i++) {
                 asset::ShaderProgram::ProgramResource::LightResource* lightResources =
                     &meshShaderPrgm->resource->LightResources[i];
 
