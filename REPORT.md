@@ -383,7 +383,3 @@ Assets staan na build in `build/assets/`. Zie `README.md` voor CI en credits (Sk
 - **Beperkingen:** Frenet-orientatie bewust niet gebruikt op de track; convolution en bloom hebben elk een eigen scene-FBO (niet tegelijk gecombineerd in één knop); picking is beperkt tot lichtbollen (geen algemene mesh picking).
 
 **Totale ontwikkeltijd (logs):** ca. 32+ uur per teamlid verspreid over april–mei 2026 (zie `logging/`).
-
----
-
-*Verslag gegenereerd op basis van de codebase en afgesloten GitHub-issues. Voor een mondelinge demo: zie `SCRIPT.md`.*
