@@ -1,7 +1,6 @@
 # Verslag - Computer Graphics Project
 
 **Cursus:** Computer Graphics & Visual Computing  
-**Repository:** [mathijs-follon/Computer-Graphics-Project](https://github.com/mathijs-follon/Computer-Graphics-Project)  
 **Team:** Tarudahat, mathijs-follon  
 **Applicatie:** `CG_OpenGL_Project` (C++23, OpenGL 4.6 Core)
 
