@@ -5,7 +5,7 @@
 **Uitvoerbaar:** `./build/CG_OpenGL_Project` (of `CG_OpenGL_Project.exe` op Windows)  
 **Tip:** Zet de console/log zichtbaar als je toetsaanslagen wilt bevestigen (bijv. “Bloom enabled”, “Chroma overlay: chroma-keyed”).
 
-**Team:** Mathijs & Sillard — de demo wordt door **één persoon** opgenomen (**Mathijs**): hij bedient de app, spreekt de voice-over en stelt **beide** teamleden voor. Sillard hoeft niet fysiek aanwezig te zijn; gebruik “wij” waar het over het project gaat.
+**Team:** Mathijs & Szilárd — de demo wordt door **één persoon** opgenomen (**Mathijs**): hij bedient de app, spreekt de voice-over en stelt **beide** teamleden voor. Szilárd hoeft niet fysiek aanwezig te zijn; gebruik “wij” waar het over het project gaat.
 
 ---
 
@@ -14,7 +14,7 @@
 | Rol | Wie | Taak |
 |-----|-----|------|
 | **Presentator & operator** | Mathijs | Script volgen, applicatie bedienen, opname (scherm + mic) |
-| **Team (niet in beeld)** | Sillard | Wordt in intro/afsluiting genoemd; bijdrage via gezamenlijk project |
+| **Team (niet in beeld)** | Szilárd | Wordt in intro/afsluiting genoemd; bijdrage via gezamenlijk project |
 
 ---
 
@@ -49,11 +49,11 @@
 
 **Tekst:**
 
-> Hallo, ik ben **Mathijs**. Samen met **Sillard** hebben we dit project gemaakt voor het vak Computer Graphics — in deze demo laat ik ons werk zien.  
+> Hallo, ik ben **Mathijs**. Samen met **Szilárd** hebben we dit project gemaakt voor het vak Computer Graphics — in deze demo laat ik ons werk zien.  
 > We hebben een interactieve 3D-scène gebouwd in **C++23** en **OpenGL 3.3**, met **GLFW**, **GLAD**, **GLM** en **spdlog**. De engine draait als pipelines met aparte **init-, update-, render- en shutdown-systemen** (ECS-achtige registry).  
 > In deze video laat ik de scene, de glijbaan, belichting, post-processing en interactie zien.
 
-**Op scherm (optioneel):** projectnaam, beide namen (Mathijs & Sillard), groepsnummer, datum.
+**Op scherm (optioneel):** projectnaam, beide namen (Mathijs & Szilárd), groepsnummer, datum.
 
 ---
 
@@ -189,9 +189,9 @@
 **Tekst:**
 
 > Samengevat: een modulaire OpenGL-engine (Assimp + stb), Bézier-glijbaan met booglengte-parameterisatie, point-light shading met ray-picking, FBO-bloom en convolutie, en YCbCr chroma-key.  
-> De broncode en session logs staan op GitHub. Bedankt voor het kijken — namens mij en Sillard.
+> De broncode en session logs staan op GitHub. Bedankt voor het kijken — namens mij en Szilárd.
 
-**Op scherm:** repo-URL, Mathijs & Sillard, eventueel CC-bronvermelding Sea Keep-model (zie README).
+**Op scherm:** repo-URL, Mathijs & Szilárd, eventueel CC-bronvermelding Sea Keep-model (zie README).
 
 ---
 

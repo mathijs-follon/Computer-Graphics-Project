@@ -1,4 +1,4 @@
-# Verslag — Computer Graphics Project
+# Verslag - Computer Graphics Project
 
 **Cursus:** Computer Graphics & Visual Computing  
 **Repository:** [mathijs-follon/Computer-Graphics-Project](https://github.com/mathijs-follon/Computer-Graphics-Project)  
@@ -11,13 +11,13 @@ Dit verslag beschrijft per GitHub-issue wat er is geïmplementeerd en **hoe** da
 
 ## Overzicht van de eindscene
 
-De demo toont een **glijbaan-scène** rond het Sketchfab-model *Sea Keep “Lonely Watcher”*: eiland met toren, pier, zee en thematische objecten (onder andere een dinosaurusrider op de glijbaan). De engine draait als een **pipeline van systemen** (init → loop → shutdown) met een centrale `Registry` voor state en scene-objecten.
+De demo toont een **glijbaan-scène** rond het Sketchfab-model *Sea Keep “Lonely Watcher”*: eiland met toren, pier, zee en thematische objecten (onder andere een dinosaurusrider op de glijbaan). De engine draait als een **pipeline van systemen** (init --> loop --> shutdown) met een centrale `Registry` voor state en scene-objecten.
 
 **Belangrijkste render-volgorde per frame** (`src/main.cpp`):
 
 1. Window clearen (of FBO clearen als bloom/convolution actief is)
 2. Scene naar HDR-FBO (bloom) of scene-FBO (convolution) of direct naar scherm
-3. Opaque meshes → transparant water → debug wireframe (curve)
+3. Opaque meshes --> transparant water --> debug wireframe (curve)
 4. Interactieve lichtbollen (emissive)
 5. Chroma-key overlay
 6. Bloom- of convolution-post-processing
@@ -27,9 +27,9 @@ De demo toont een **glijbaan-scène** rond het Sketchfab-model *Sea Keep “Lone
 
 ---
 
-## Milestone 1 — Engine Skeleton & Asset Pipeline
+## Milestone 1 - Engine Skeleton & Asset Pipeline
 
-### Issue #1 — Group Registration (process)
+### Issue #1 - Group Registration (process)
 
 **Status:** Afgerond.
 
@@ -37,7 +37,7 @@ Registratie van de projectgroep en afspraken over verdeling en planning. De same
 
 ---
 
-### Issue #2 — Project Architecture & Build System
+### Issue #2 - Project Architecture & Build System
 
 **Status:** Afgerond.
 
@@ -56,7 +56,7 @@ Dit scheidt **wat** er per frame gebeurt (stages) van **data** (registry), zodat
 
 ---
 
-### Issue #3 — Window & Input Context
+### Issue #3 - Window & Input Context
 
 **Status:** Afgerond.
 
@@ -71,7 +71,7 @@ Input voor camera en gameplay gebeurt in aparte systemen (camera, glijbaan, …)
 
 ---
 
-### Issue #4 — GLM Integration & Base Camera
+### Issue #4 - GLM Integration & Base Camera
 
 **Status:** Afgerond.
 
@@ -87,7 +87,7 @@ De frustum (`Frustum::fromViewProjection`) wordt gebruikt in `rendering::gatherC
 
 ---
 
-### Issue #5 — Texture Loader (stb_image)
+### Issue #5 - Texture Loader (stb_image)
 
 **Status:** Afgerond.
 
@@ -102,7 +102,7 @@ Textures worden gekoppeld aan material slots bij model load en aan overrides (gl
 
 ---
 
-### Issue #6 — Model Loader (tinygltf / Assimp)
+### Issue #6 - Model Loader (Assimp)
 
 **Status:** Afgerond.
 
@@ -117,24 +117,24 @@ Textures worden gekoppeld aan material slots bij model load en aan overrides (gl
 
 ---
 
-## Milestone 2 — Bezier Curves, Splines & Track Generation
+## Milestone 2 - Bezier Curves, Splines & Track Generation
 
-### Issue #7 — Bezier Curve Math
+### Issue #7 - Bezier Curve Math
 
 **Status:** Afgerond.
 
-**Hoe:** `src/graphics/geometry.hpp` — struct `CubicBezierCurve`
+**Hoe:** `src/graphics/geometry.hpp` - struct `CubicBezierCurve`
 
 - Kubische Bézier met **Bernstein-basismatrix** `basis` en control points als `glm::mat4x3`.
 - Evaluatie: `pointAt(t)`, `tangentAt(t)` via machten van \(t\).
-- **Forward differencing** (`sampleFD`) samplet de curve en bouwt tegelijk een **arc-length LUT**: map `(afstand → parameter t)`.
-- Optioneel: `frenetFrameAt(t)` (tangent, normal, binormal) — zie issue #11.
+- **Forward differencing** (`sampleFD`) samplet de curve en bouwt tegelijk een **arc-length LUT**: map `(afstand --> parameter t)`.
+- Optioneel: `frenetFrameAt(t)` (tangent, normal, binormal) - zie issue #11.
 
 **Glijbaan:** `src/app/objects/glijbaan.hpp` zet **Catmull-Rom-knots** om naar cubic Bézier-segmenten (`catmullRomToBezier`) voor \(C^1\) spline-gedrag over 8 segmenten.
 
 ---
 
-### Issue #8 — Debug Curve Visualizer
+### Issue #8 - Debug Curve Visualizer
 
 **Status:** Afgerond.
 
@@ -148,13 +148,13 @@ Zo kan de spline gecontroleerd worden vóór/naast de half-pipe geometrie.
 
 ---
 
-### Issue #9 — Arc-Length Parameterization (Constant Speed)
+### Issue #9 - Arc-Length Parameterization (Constant Speed)
 
 **Status:** Afgerond.
 
 **Hoe:** `CubicBezierCurve::arcLengthLUT` + `tvalueForDistance` + `glijbaan::sampleAtDistance`
 
-- Tijdens sampling wordt kumulatieve booglengte bijgehouden; LUT mapt **boogafstand \(d\)** → **curveparameter \(t\)** (lineaire interpolatie tussen LUT-entries).
+- Tijdens sampling wordt kumulatieve booglengte bijgehouden; LUT mapt **boogafstand \(d\)** --> **curveparameter \(t\)** (lineaire interpolatie tussen LUT-entries).
 - `rideSystem` verhoogt `rideDistance` met `rideSpeed * deltaTime` (constant in **meter per seconde**, niet per \(t\)).
 - `wrapArcLength` maakt de baan cyclisch.
 
@@ -162,7 +162,7 @@ Handmatig rijden (W/S in slide-camera) gebruikt dezelfde parametrisatie.
 
 ---
 
-### Issue #10 — Dynamic Track Geometry
+### Issue #10 - Dynamic Track Geometry
 
 **Status:** Afgerond.
 
@@ -177,7 +177,7 @@ De **dinosaurusrider** volgt `rideDistance` via `seatPositionOnPath` en `orienta
 
 ---
 
-### Issue #11 — Object Orientation (Frenet Frame)
+### Issue #11 - Object Orientation (Frenet Frame)
 
 **Status:** Niet gepland (overgeslagen).
 
@@ -187,9 +187,9 @@ Orientatie rider: `orientationFromTrackFrame` + optionele yaw/pitch-correctie op
 
 ---
 
-## Milestone 3 — Advanced Shaders & Framebuffers
+## Milestone 3 - Advanced Shaders & Framebuffers
 
-### Issue #12 — Per-Pixel Lighting
+### Issue #12 - Per-Pixel Lighting
 
 **Status:** Afgerond.
 
@@ -203,14 +203,14 @@ Orientatie rider: `orientationFromTrackFrame` + optionele yaw/pitch-correctie op
 
 - Struct `Material` + array `PointLight u_lights[16]` (max `LIGHT_COUNT_MAX`).
 - Per licht (indien `on == 1`): ambient, diffuse (Lambert), specular (Phong, `shininess`), met **distance attenuation** \(1 / (1 + k_l d + k_q d^2)\).
-- Albedo uit `sampler2D u_albedo`; alpha &lt; 0.5 → `discard` (bladeren/fences).
+- Albedo uit `sampler2D u_albedo`; alpha &lt; 0.5 --> `discard` (bladeren/fences).
 - Basis ambient `vec3(0.18)` plus opgetelde lichten, vermenigvuldigd met albedo.
 
 **CPU:** `lights::setupSystem` zet slot 0 (zon-achtig puntlicht ver weg). `interactive_lights` vult slots 1–5 dynamisch.
 
 ---
 
-### Issue #13 — FBO Setup & Screen Quad
+### Issue #13 - FBO Setup & Screen Quad
 
 **Status:** Afgerond.
 
@@ -224,23 +224,23 @@ Post-process passes schrijven eerst naar FBO’s, daarna een quad naar framebuff
 
 ---
 
-### Issue #14 — Convolution Post-Processing
+### Issue #14 - Convolution Post-Processing
 
 **Status:** Afgerond.
 
 **Hoe:** `src/app/convolution.hpp`
 
-- Toets **P** cyclust: uit → **Gaussian blur** → **Laplacian edge detection**.
+- Toets **P** cyclust: uit --> **Gaussian blur** --> **Laplacian edge detection**.
 - Scene rendert naar `sceneFbo` (`beginScenePassSystem`).
-- **Gaussian:** hergebruikt `bloom_blur.frag` — separable 5-tap kernel met vaste gewichten, 3 ping-pong passes (horizontaal/verticaal).
-- **Laplacian:** `laplacian_edge.frag` — 5×5 kernel (klassische sharpen/edge kernel met centrale +16).
+- **Gaussian:** hergebruikt `bloom_blur.frag` - separable 5-tap kernel met vaste gewichten, 3 ping-pong passes (horizontaal/verticaal).
+- **Laplacian:** `laplacian_edge.frag` - 5×5 kernel (klassische sharpen/edge kernel met centrale +16).
 - Resultaat naar scherm via `screen_quad.frag` (texture blit).
 
 **Shader `laplacian_edge.frag`:** nested loops over 5×5 offsets met `u_texelSize`.
 
 ---
 
-### Issue #15 — Bloom / Neon Effect Pipeline
+### Issue #15 - Bloom / Neon Effect Pipeline
 
 **Status:** Afgerond.
 
@@ -248,7 +248,7 @@ Post-process passes schrijven eerst naar FBO’s, daarna een quad naar framebuff
 
 - Toets **B** schakelt bloom in/uit.
 - **Pipeline:**
-  1. Scene → HDR `sceneFbo` (RGBA16F).
+  1. Scene --> HDR `sceneFbo` (RGBA16F).
   2. **Bright pass** (`bloom_bright.frag`): luminantie threshold + soft knee (`smoothstep`).
   3. **Blur** (`bloom_blur.frag`): separable Gaussian, 5 iteraties ping-pong op halve resolutie (`kBloomBufferScale = 0.5`).
   4. **Composite** (`bloom_composite.frag`): `scene + u_intensity * bloom`.
@@ -257,15 +257,15 @@ Emissive objecten (lichtbollen met hoge kleurwaarden) dragen bij aan het bloom-m
 
 ---
 
-## Milestone 4 — Interaction, Chroma-key & Camera Polish
+## Milestone 4 - Interaction, Chroma-key & Camera Polish
 
-### Issue #16 — Chroma-keying (YCbCr)
+### Issue #16 - Chroma-keying (YCbCr)
 
 **Status:** Afgerond.
 
 **Hoe:** `src/app/chroma.hpp`, `assets/shaders/chroma.vert`, `assets/shaders/chroma.frag`
 
-- Toets **L:** hidden → raw overlay → chroma-keyed.
+- Toets **L:** hidden --> raw overlay --> chroma-keyed.
 - Fullscreen quad met `assets/textures/chroma_key.jpg`.
 - **`chroma.frag`:**
   - `rgbToYCbCr` (BT.601-achtige coëfficiënten).
@@ -273,11 +273,11 @@ Emissive objecten (lichtbollen met hoge kleurwaarden) dragen bij aan het bloom-m
   - Onder threshold: `discard`; tussen threshold en threshold+softness: `smoothstep` op alpha.
 - Raw mode: `u_enableKey == false`, volledige overlay zonder discard.
 
-Depth uit, alpha blending aan — groene achtergrond verdwijnt, scene schijnt door.
+Depth uit, alpha blending aan - groene achtergrond verdwijnt, scene schijnt door.
 
 ---
 
-### Issue #17 — Interaction via Raycasting / Picking
+### Issue #17 - Interaction via Raycasting / Picking
 
 **Status:** Afgerond.
 
@@ -286,13 +286,13 @@ Depth uit, alpha blending aan — groene achtergrond verdwijnt, scene schijnt do
 - Vijf **transparante emissive spheres** op vaste posities langs de glijbaan; elk gekoppeld aan point-light slot 1–5.
 - **Picking:** bij linkermuisklik (alleen als cursor captured) ray van `camera.position` langs `normalize(camera.front)`.
 - **Ray-sphere intersectie:** kwadratische vergelijking; kleinste positieve \(t\) binnen `farZ` wint.
-- Treffer → `colorIndex` cyclisch door palette (wit, rood, oranje, geel, groen, cyaan, magenta); `writeLightSlot` past alle geladen `default.frag`-programma’s aan.
+- Treffer --> `colorIndex` cyclisch door palette (wit, rood, oranje, geel, groen, cyaan, magenta); `writeLightSlot` past alle geladen `default.frag`-programma’s aan.
 
-**Render:** `emissive.frag` — uniforme kleur × `kEmissiveBoost`, alpha 0.55, gesorteerd back-to-front.
+**Render:** `emissive.frag` - uniforme kleur × `kEmissiveBoost`, alpha 0.55, gesorteerd back-to-front.
 
 ---
 
-### Issue #18 — First-Person Ride Camera
+### Issue #18 - First-Person Ride Camera
 
 **Status:** Afgerond.
 
@@ -306,9 +306,9 @@ Glijbaan-input: **G** auto-ride, **R** reset, **W/S** handmatig in ride-modus, p
 
 ---
 
-## Milestone 5 — The Ace It Phase
+## Milestone 5 - The Ace It Phase
 
-### Issue #19 — Thematic Dressing & Polish
+### Issue #19 - Thematic Dressing & Polish
 
 **Status:** Afgerond.
 
@@ -383,7 +383,3 @@ Assets staan na build in `build/assets/`. Zie `README.md` voor CI en credits (Sk
 - **Beperkingen:** Frenet-orientatie bewust niet gebruikt op de track; convolution en bloom hebben elk een eigen scene-FBO (niet tegelijk gecombineerd in één knop); picking is beperkt tot lichtbollen (geen algemene mesh picking).
 
 **Totale ontwikkeltijd (logs):** ca. 32+ uur per teamlid verspreid over april–mei 2026 (zie `logging/`).
-
----
-
-*Verslag gegenereerd op basis van de codebase en afgesloten GitHub-issues. Voor een mondelinge demo: zie `SCRIPT.md`.*
