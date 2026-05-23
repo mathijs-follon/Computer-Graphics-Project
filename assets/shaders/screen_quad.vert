@@ -1,8 +1,7 @@
 #version 460 core
 
-// Shared vertex shader for fullscreen post-process passes.
-// Vertex positions are already in NDC ([-1, 1]); we just emit UVs to sample
-// the previous-pass color texture.
+// Shared vertex shader for fullscreen post process passes.
+// Vertex positions are already in([-1, 1]) emit UVs to sample the previous pass color texture.
 layout (location = 0) in vec2 a_pos;
 layout (location = 1) in vec2 a_uv;
 

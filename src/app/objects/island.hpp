@@ -1,13 +1,15 @@
 #ifndef CG_OPENGL_PROJECT_ISLAND_HPP
 #define CG_OPENGL_PROJECT_ISLAND_HPP
 
+#include "app/app.hpp"
 #include "asset/asset.hpp"
 #include "asset/asset_paths.hpp"
 #include "asset/render_object_spawner.hpp"
-#include "glad/gl.h"
 #include "graphics/rendering.hpp"
 #include "log/log.hpp"
 #include "world/registry.hpp"
+
+#include <glad/gl.h>
 
 #include <array>
 #include <filesystem>
@@ -25,9 +27,12 @@ struct Transform {
     float uniformTargetSize = 1200.0f;
 };
 
+inline constexpr auto kIslandStateName = "scene.island.state";
+
 struct IslandState {
-    float time{};
+    GLuint waterProgramId = 0U;
     GLint locTime = -1;
+    float time = 0.0f;
 };
 
 inline bool isIslandWaterMeshName(const std::string_view meshName) {
@@ -142,9 +147,12 @@ inline void setupSystem(Registry& registry) {
             "assets/shaders/water.vert", "assets/shaders/water.frag");
         applyWaterShaderToIslandMeshes(registry, request.namePrefix, islandModel, waterProgram);
 
-        // IslandState state{0.0, -1};
-        // state.locTime = glGetUniformLocation(waterProgram.id, "u_time");
-        // registry.registerObject("scene.island.state", state);
+        IslandState islandState{};
+        islandState.waterProgramId = waterProgram.id;
+        if (waterProgram.id != 0U) {
+            islandState.locTime = glGetUniformLocation(waterProgram.id, "u_time");
+        }
+        registry.registerObject(kIslandStateName, std::move(islandState));
 
         LOG_INFO("Spawned '{}' from '{}' ({} meshes, texture={})", request.namePrefix, candidate,
                  result.meshCount, textureSelectionToString(result.textureSelection));
@@ -154,22 +162,19 @@ inline void setupSystem(Registry& registry) {
     LOG_WARN("Could not find sea_keep model. Tried {} candidate path(s).", kModelCandidates.size());
 }
 
-// inline void updateWaterTime(Registry& registry) {
-//     auto* mesh =
-//     registry.getObject<rendering::RenderMeshInstance>("scene.island.sea_keep.mesh.5"); auto*
-//     islandState = registry.getObject<IslandState>("scene.island.state"); const auto* time =
-//     registry.getObject<App::Time>("app.time");
+inline void updateWaterTimeSystem(Registry& registry) {
+    auto* islandState = registry.getObject<IslandState>(kIslandStateName);
+    const auto* appTime = registry.getObject<App::Time>("app.time");
+    if (islandState == nullptr || appTime == nullptr || islandState->waterProgramId == 0U ||
+        islandState->locTime < 0) {
+        return;
+    }
 
-//     if (mesh == nullptr || mesh->shaderProgram == 0 || time == nullptr || islandState == nullptr
-//     ||
-//         islandState->locTime == 0)
-//         return;
-
-//     glUseProgram(mesh->shaderProgram);
-//     glUniform1f(islandState->locTime, islandState->time);
-//     islandState->time += 10 * time->deltaTime;
-//     glUseProgram(0);
-// }
+    islandState->time += appTime->deltaTime;
+    glUseProgram(islandState->waterProgramId);
+    glUniform1f(islandState->locTime, islandState->time);
+    glUseProgram(0);
+}
 
 }  // namespace island
 

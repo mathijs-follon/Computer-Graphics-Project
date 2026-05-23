@@ -1,7 +1,7 @@
 #version 460 core
 
 // Screen-aligned quad: a_pos is already in normalized device coordinates ([-1, 1]).
-// No view/projection needed; we draw the quad directly in clip space.
+// No view/projection needed, draw the quad directly in clip space.
 layout (location = 0) in vec2 a_pos;
 layout (location = 1) in vec2 a_uv;
 

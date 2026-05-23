@@ -14,7 +14,7 @@ void main() {
     float ay = abs(v_local.y);
 
     bool onHorizontalArm = (ay < u_thickness) && (ax > u_gap) && (ax < 1.0);
-    bool onVerticalArm   = (ax < u_thickness) && (ay > u_gap) && (ay < 1.0);
+    bool onVerticalArm = (ax < u_thickness) && (ay > u_gap) && (ay < 1.0);
 
     if (!onHorizontalArm && !onVerticalArm) {
         discard;

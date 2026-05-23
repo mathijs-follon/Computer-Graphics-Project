@@ -41,6 +41,7 @@ void setupLoopSystems(App& app) {
     app.addLoopSystem(LoopStage::Update, glijbaan::inputSystem);
     app.addLoopSystem(LoopStage::Update, glijbaan::rideSystem);
     app.addLoopSystem(LoopStage::Update, chroma::inputSystem);
+    app.addLoopSystem(LoopStage::Update, island::updateWaterTimeSystem);
     app.addLoopSystem(LoopStage::Update, bloom::inputSystem);
     app.addLoopSystem(LoopStage::Update, convolution::inputSystem);
     // Picking runs after camera::inputSystem so it sees the up-to-date
