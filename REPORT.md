@@ -102,7 +102,7 @@ Textures worden gekoppeld aan material slots bij model load en aan overrides (gl
 
 ---
 
-### Issue #6 — Model Loader (tinygltf / Assimp)
+### Issue #6 — Model Loader (Assimp)
 
 **Status:** Afgerond.
 
