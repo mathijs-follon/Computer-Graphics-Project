@@ -93,7 +93,7 @@ De frustum (`Frustum::fromViewProjection`) wordt gebruikt in `rendering::gatherC
 
 **Hoe:** `src/asset/texture.cpp`
 
-- **stb_image** laadt PNG/JPG; `stbi_set_flip_vertically_on_load(true)` voor OpenGL-UV’s.
+- **stb_image** laadt PNG/JPG; gebruik`stbi_set_flip_vertically_on_load(true)` voor correcte verticale OpenGL-UV mapping.
 - Intern format afhankelijk van kanaalaantal (R8, RG8, RGB8, RGBA8).
 - Mipmaps: `glGenerateMipmap`, `GL_LINEAR_MIPMAP_LINEAR`, repeat wrapping.
 - Fouten loggen via spdlog; loader retourneert `std::optional<Texture>`.
@@ -201,10 +201,10 @@ Orientatie rider: `orientationFromTrackFrame` + optionele yaw/pitch-correctie op
 
 **Fragment shader (`default.frag`):**
 
-- Struct `Material` + array `PointLight u_lights[16]` (max `LIGHT_COUNT_MAX`).
+- Struct `Material` (enkel shininess gebruikt, material sampling onnodig aangezien modellen deze niet hebben) + array `PointLight u_lights[16]` (max `LIGHT_COUNT_MAX`).
 - Per licht (indien `on == 1`): ambient, diffuse (Lambert), specular (Phong, `shininess`), met **distance attenuation** \(1 / (1 + k_l d + k_q d^2)\).
 - Albedo uit `sampler2D u_albedo`; alpha &lt; 0.5 --> `discard` (bladeren/fences).
-- Basis ambient `vec3(0.18)` plus opgetelde lichten, vermenigvuldigd met albedo.
+- Basis stilistische ambient `vec3(0.18)` (onafhankelijk van attenuation) plus opgetelde lichten, vermenigvuldigd met albedo.
 
 **CPU:** `lights::setupSystem` zet slot 0 (zon-achtig puntlicht ver weg). `interactive_lights` vult slots 1–5 dynamisch.
 
@@ -336,7 +336,7 @@ Glijbaan-input: **G** auto-ride, **R** reset, **W/S** handmatig in ride-modus, p
 
 | Bestand | Rol |
 |---------|-----|
-| `default.vert` / `default.frag` | Lit textured meshes, 16 point lights |
+| `default.vert` / `default.frag` | Lit textured meshes, supports max 16 point lights |
 | `water.vert` / `water.frag` | Geanimeerd transparant water |
 | `raw_vert.vert` / `raw_vert.frag` | Rode debug-lijnen (curve) |
 | `emissive.frag` | Onverlichte emissive kleur (lichtbollen) |
