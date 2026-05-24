@@ -5,6 +5,8 @@
 
 A C++23 and OpenGL project built with CMake that showcases an interactive 3D scene and several real-time rendering techniques. The codebase is structured into small systems for windowing, camera control, rendering, lighting, post-processing, and scene objects, which makes the project easier to extend and experiment with.
 
+**Demo:** [youtube video](https://www.youtube.com/watch?v=W0UpU7VaEPI)
+
 ## What this project demonstrates
 
 * Real-time rendering with OpenGL
