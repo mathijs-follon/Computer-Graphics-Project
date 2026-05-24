@@ -372,13 +372,13 @@ cmake --build build
 ./build/CG_OpenGL_Project
 ```
 
-Assets staan na build in `build/assets/`. Zie `README.md` voor CI en credits (Sketchfab-modellen).
+Assets staan automatisch na build in `build/assets/`. Zie `README.md` voor CI en credits (Sketchfab-modellen).
 
 ---
 
 ## Reflectie
 
 - **Sterk:** modulaire pipeline, duidelijke scheiding van post-process passes, hergebruik van `bloom_blur.frag` voor convolution, constante snelheid op de glijbaan via arc-length LUT.
-- **Beperkingen:** Frenet-orientatie bewust niet gebruikt op de track; convolution en bloom hebben elk een eigen scene-FBO (niet tegelijk gecombineerd in één knop); picking is beperkt tot lichtbollen (geen algemene mesh picking).
+- **Beperkingen:** Convolution en bloom hebben elk een eigen scene-FBO (niet tegelijk gecombineerd in één knop); picking is beperkt tot lichtbollen (geen algemene mesh picking).
 
-**Totale ontwikkeltijd (logs):** ca. 32+ uur per teamlid verspreid over april–mei 2026 (zie `logging/`).
+**Totale ontwikkeltijd (logs):** ca. ~40 uur per teamlid verspreid over april–mei 2026 (zie `logging/`).

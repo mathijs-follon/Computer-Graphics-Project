@@ -48,4 +48,3 @@
 
 - Total Hours Spent: ~67, ik ben nogal perfectionistisch ofzo en ben met heel veel dingen vaak volledig opnieuw begonnen.
 - Most Time-Consuming Part: Model loading, materials shaders + rendering pipeline
-- What Could Be Improved: alles volgens mij, maar zeker bv. bloom en blur tegelijk wat nu niet gaat
