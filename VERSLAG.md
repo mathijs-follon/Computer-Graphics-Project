@@ -1,9 +1,8 @@
 # Verslag - Computer Graphics Project
-
-**Cursus:** Computer Graphics & Visual Computing  
-**Team:** Tarudahat, mathijs-follon  
-**Applicatie:** `CG_OpenGL_Project` (C++23, OpenGL 4.6 Core)
-**Demo:** [youtube video](https://www.youtube.com/watch?v=W0UpU7VaEPI)
+- **Cursus:** Computer Graphics & Visual Computing 
+- **Team:** Tarudahat, mathijs-follon 
+- **Applicatie:** `CG_OpenGL_Project` (C++23, OpenGL 4.6 Core) 
+- **Demo:** [youtube video](https://www.youtube.com/watch?v=W0UpU7VaEPI)
 
 Dit verslag beschrijft per GitHub-issue wat er is geïmplementeerd en **hoe** dat technisch werkt. De tekst is in het Nederlands; vaktermen (shader, framebuffer, uniform, …) blijven in het Engels zoals gebruikelijk in graphics-documentatie.
 
